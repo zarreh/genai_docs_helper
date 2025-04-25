@@ -1,0 +1,2656 @@
+# tactiq.io free youtube transcript
+# Talks S2E7 (Konrad Banachewicz): Time Series Analysis - Vintage Toolkit For Modern Times
+# https://www.youtube.com/watch/cKzXOOtOXYY
+
+00:00:00.230 [Music]
+00:00:24.720 hello everyone and welcome to this brand
+00:00:26.800 new episode of talks and today i'm very
+00:00:29.359 excited because
+00:00:30.720 uh today conrad is talking about time
+00:00:33.440 three analysis and i don't know much
+00:00:35.440 about time series so hopefully there's a
+00:00:37.440 lot for me to learn today and conrad is
+00:00:40.000 also a very good friend uh we
+00:00:42.719 we used to catal together nowadays we
+00:00:45.039 don't find much time to candle together
+00:00:48.000 right so uh you're working in adavanta
+00:00:51.120 and what's this company about previously
+00:00:53.039 you were in ebay now you have moved to a
+00:00:55.360 new company yeah well it's more like the
+00:00:57.840 company hi first of all glorious day to
+00:01:00.399 you sir thanks for having me
+00:01:02.719 thank you
+00:01:03.600 i
+00:01:04.479 uh uh i work at other india it's not so
+00:01:06.560 much that i moved to a new company as
+00:01:08.479 the company moved around me because the
+00:01:10.799 part of ebay i was in we changed hands
+00:01:13.200 it was it was sold to adevinta so it was
+00:01:15.520 the classifiers group well used to be
+00:01:17.759 ebay now it's now it's
+00:01:20.400 in terms of what i do um i'm a lead data
+00:01:22.720 scientist in the central data science
+00:01:24.720 team
+00:01:26.240 uh which in practice means well
+00:01:29.680 being the guy with enough seniority that
+00:01:31.600 when i say this is not gonna work people
+00:01:34.159 actually listen
+00:01:35.680 uh well doing enough to prove then i can
+00:01:38.880 just you know not just talk the talk but
+00:01:41.200 also walk the walk i think americans
+00:01:42.960 have this kind of saying
+00:01:44.640 uh what do we do well it's an e-commerce
+00:01:46.720 company so primarily we are concerned
+00:01:50.000 with the fact that when you come to our
+00:01:51.360 website you click what we hope you will
+00:01:53.600 click
+00:01:54.560 and best way to achieve it is well it's
+00:01:57.119 like free objectives that you have to
+00:01:58.560 reconcile if people sell through our
+00:02:01.200 platform they want to sell as expensive
+00:02:03.200 as possible if people buy for our
+00:02:05.439 platform they want to buy as cheaply as
+00:02:07.520 possible
+00:02:08.639 and we are sitting in the middle and we
+00:02:10.318 would like to make some money while
+00:02:11.599 we're doing it
+00:02:13.520 so those objectives don't exactly go
+00:02:16.080 very well together and balancing them is
+00:02:18.879 well that's that that's the part where
+00:02:20.560 data science comes in in terms of more
+00:02:22.959 specific stuff uh recommenders ranking
+00:02:27.040 we started doubling a little bit into
+00:02:29.040 reinforcement learning lately
+00:02:31.599 oh let me think what else well obvious
+00:02:34.160 run-of-the-mill stuff like fraud
+00:02:35.519 detection but user detection uh chat
+00:02:38.400 moderation
+00:02:40.319 what about time series
+00:02:42.640 i am working my way into this one i'm
+00:02:44.879 working my way into this one because
+00:02:47.519 you know the funny thing about time
+00:02:49.120 series uh
+00:02:51.680 well i've been doing time series like
+00:02:53.680 way back in university
+00:02:55.920 god helped me close to a close to
+00:02:57.599 quarter of a century ago
+00:02:59.440 and then i was under the impression that
+00:03:01.360 nobody really cared about time series
+00:03:03.200 anymore so i was like yeah well it was a
+00:03:05.680 i kid you not because nobody did like it
+00:03:08.560 peaked when i was in finance with
+00:03:10.159 financial models
+00:03:11.840 and i don't think i've actually used it
+00:03:13.599 at work for the last i don't know five
+00:03:15.760 years easily and then slowly getting to
+00:03:18.480 another and i was just like
+00:03:20.239 actually those people wanna you know
+00:03:22.400 wanna talk about time series and those
+00:03:24.319 people are interested and it slowly
+00:03:26.720 started coming back
+00:03:28.480 er
+00:03:29.680 undoubtedly it was partly because
+00:03:32.640 you know deep learning and lstm being
+00:03:35.280 the revolution that it was
+00:03:37.040 but not everybody has enough data to
+00:03:38.560 have deep learning not infrastructure
+00:03:40.159 for that matter i mean okay these days
+00:03:42.080 it's a little more commoditized because
+00:03:43.840 if nothing else works you can just fire
+00:03:45.519 up collab in your browser but you and i
+00:03:47.599 both know that was not really the case
+00:03:48.959 like five six years ago true
+00:03:52.720 well back in the day at least like
+00:03:54.879 financial analysis financial math and
+00:03:56.879 whatnot
+00:03:57.920 r ruled the field and if there's one
+00:04:00.239 thing where i still to this day think
+00:04:02.239 that r dominates over python it's it's
+00:04:04.799 time series functionality okay
+00:04:07.040 okay
+00:04:08.640 well i
+00:04:09.599 which by the way that's doesn't
+00:04:11.680 contradict the fact that i uh am giving
+00:04:14.560 code examples in python in my
+00:04:16.560 presentation because
+00:04:18.720 you know i'm not gonna fight the global
+00:04:20.320 tide
+00:04:21.440 that's just the way things are going
+00:04:23.440 this is what everybody is using in terms
+00:04:25.600 of
+00:04:26.400 data related modeling
+00:04:29.040 sure and uh
+00:04:30.960 you have also made a series
+00:04:33.520 of notebooks on kaggle on time series so
+00:04:36.080 i will be sharing the link of all
+00:04:38.320 all the all the notebooks in that series
+00:04:40.639 as a pinned comment to this video so if
+00:04:42.560 the audience is interested and it's a
+00:04:44.639 very good series so please go through it
+00:04:47.199 go through each and every kernel and
+00:04:48.880 there's a lot to learn
+00:04:50.479 conrad has invested a lot of time in
+00:04:52.479 those notebooks
+00:04:54.320 so um
+00:04:56.080 a fifth one but unfortunately events of
+00:04:58.639 you know this thing called life that's
+00:05:00.800 happening when you're not cuddling uh
+00:05:02.960 prevented me from from finishing the
+00:05:05.039 fifth one uh but i hope to have it
+00:05:07.440 soonish
+00:05:08.840 okay so it's an ongoing
+00:05:10.880 oh very much so very much so there's i
+00:05:13.440 think
+00:05:14.160 four out
+00:05:15.520 and i have ideas for at least another
+00:05:17.680 six
+00:05:18.720 okay
+00:05:19.840 that's very nice
+00:05:24.080 cool cool so yeah looking forward to the
+00:05:26.479 presentation so the screen is all yours
+00:05:29.120 now
+00:05:30.000 i think we are already in sharing mode
+00:05:32.800 uh and
+00:05:33.680 [Music]
+00:05:35.520 full screen
+00:05:37.360 so i'm fairly certain what you should be
+00:05:38.800 seeing right now
+00:05:40.160 yes
+00:05:41.199 excellent then we're ready to begin
+00:05:44.400 well thanks everyone for joining me on
+00:05:47.199 abhishek and myself on this lovely
+00:05:49.360 saturday
+00:05:51.759 afternoon where i'm sitting
+00:05:56.560 what can we do
+00:05:57.840 about
+00:05:59.759 time series i mean brief overview first
+00:06:02.880 uh general first of all
+00:06:05.440 general comment time series is an
+00:06:07.680 absolutely huge field
+00:06:09.919 so the overview i'm giving you in this
+00:06:12.319 presentation it doesn't begin to scratch
+00:06:15.120 the surface this is like a really really
+00:06:17.600 high level to point you to
+00:06:19.600 some useful stuff that you can already
+00:06:21.600 achieve with
+00:06:22.800 fairly elementary techniques
+00:06:25.039 although as my probability lecture at
+00:06:27.120 uni used to say elementary ladies and
+00:06:29.360 gentlemen is not the same as trivial
+00:06:31.919 so the four main topics we will touch in
+00:06:35.759 this presentation is well the basic
+00:06:37.520 groundwork so we have a couple of
+00:06:38.880 definitions that we can work with or
+00:06:41.039 simple tools
+00:06:42.400 forecasting so let's be honest
+00:06:44.560 that's like nine out of ten cases what
+00:06:46.960 people want to know about when they hear
+00:06:48.960 the phrase time series i'm gonna dig a
+00:06:51.039 little deeper to have a bit of an
+00:06:53.840 introduction to what you can do in
+00:06:55.280 situations where you want to find out
+00:06:57.599 what's actually going on and not merely
+00:07:00.080 have a good prediction of the of next
+00:07:02.160 observation
+00:07:03.440 and then
+00:07:04.479 depending on how it goes time wise
+00:07:07.360 we'll go a little bit into
+00:07:09.840 okay for lack of anomaly detection
+00:07:11.919 although you may have
+00:07:13.759 encountered the term outlier detection
+00:07:16.240 or some such
+00:07:18.880 so what can we say about time series
+00:07:21.360 first of all it's been around for a very
+00:07:23.120 very long time
+00:07:24.479 if you go through
+00:07:26.000 well earlier stuff around it
+00:07:29.199 the two guys i believe they were at
+00:07:30.960 stanford julen walker in 1920s they
+00:07:34.000 started
+00:07:35.280 building models which
+00:07:37.120 later
+00:07:38.240 ended up as the first
+00:07:40.319 massively used time series models
+00:07:44.000 there's gonna be a lot of definitions
+00:07:45.759 you might encounter uh you open a proper
+00:07:48.319 math book someone might be starting it
+00:07:50.319 by saying that yeah a time series is a
+00:07:52.720 specific realization of a stochastic
+00:07:54.720 process defined on the probability space
+00:07:56.720 blah blah in reality in practice unless
+00:07:59.680 you're working in the math department
+00:08:01.520 everything you measure over time is a
+00:08:03.039 time series period
+00:08:05.440 anything beyond that that's just uh well
+00:08:07.840 algebraic bookkeeping
+00:08:10.160 what can we do if we have a set of
+00:08:12.080 measurements of a certain phenomenon
+00:08:13.840 over time
+00:08:15.280 well we might want to interpret it to
+00:08:17.360 find out what's actually going on
+00:08:19.840 and that's something that we will be
+00:08:22.000 touching upon in the in the digging
+00:08:24.240 deeper section
+00:08:25.520 we can try to filter smooth or smooth
+00:08:28.800 depending on what you use
+00:08:30.879 our observations to remove the noise the
+00:08:34.479 good a good example to think of is
+00:08:37.200 say you are observing a trajectory of a
+00:08:39.279 car from the outside
+00:08:41.519 and you want to know
+00:08:43.200 which what kind of movements the driver
+00:08:45.120 was making
+00:08:46.160 i mean yes there obviously is some
+00:08:47.440 correspondence if the current car went
+00:08:49.200 left and the driver probably turned left
+00:08:51.600 it's not a 1-1 there's some sort of
+00:08:53.600 noise which prevents you from seeing the
+00:08:55.279 real signal and that's what filtering
+00:08:57.360 and smoothing is about
+00:08:59.200 uh forecasting this is what everybody is
+00:09:02.320 looking in like i mentioned earlier what
+00:09:04.240 nine out of ten cases what people think
+00:09:06.080 about when they hear the phrase time
+00:09:07.200 series and finally simulation
+00:09:09.839 there are certain applications where you
+00:09:11.360 can't really estimate anything because
+00:09:13.440 you just don't have enough data so you
+00:09:15.279 need a good reliable model from which
+00:09:16.880 you can simulate stuff
+00:09:19.360 i think
+00:09:20.880 risk calculations in a bank
+00:09:23.519 uh
+00:09:24.480 points to address already at this stage
+00:09:26.800 uh i've been known to use the phrase
+00:09:29.040 deep learn everything
+00:09:30.560 in a somewhat sarcastic manner
+00:09:33.680 that doesn't mean by any stretch of the
+00:09:35.920 imagination that i bash criticize or
+00:09:38.640 what or whatever deep learning
+00:09:40.880 i think the planning is awesome i think
+00:09:42.399 it's one of the greatest breakthroughs
+00:09:43.760 in the history of machine learning
+00:09:47.279 it allows you to solve a
+00:09:49.200 huge amount of problems however what it
+00:09:51.600 isn't it it isn't cheap you need a lot
+00:09:54.720 of data
+00:09:56.000 to get deep learning to work and it's
+00:09:58.240 that problem is particularly acute if
+00:10:00.399 you're dealing with time series because
+00:10:02.160 no matter what your domain where you are
+00:10:03.760 dealing with text or
+00:10:05.600 images
+00:10:06.959 there's always a chance you can find out
+00:10:08.800 some more unlabeled data in terms of
+00:10:11.120 time series
+00:10:12.560 say your company started gathering
+00:10:14.320 monthly data i don't know 10 years ago
+00:10:17.600 that means 120 observations on the
+00:10:19.680 series of interest
+00:10:21.360 that's not exactly a lot to write home
+00:10:23.600 about
+00:10:25.839 to wrap it up it's useful to have deep
+00:10:28.160 learning to understand deep learning and
+00:10:30.079 it is indeed one of the things i intend
+00:10:31.680 to address in the later parts of the of
+00:10:34.320 my of my notebook series
+00:10:36.160 but
+00:10:37.200 it is
+00:10:38.240 quite important also to have
+00:10:40.800 uh tools that you can use where you have
+00:10:43.440 you know 300 observations and that's it
+00:10:47.600 uh
+00:10:48.959 every domain
+00:10:50.320 that you're dealing with has a text has
+00:10:52.480 a pretty much a reference data set that
+00:10:55.200 you use to demonstrate things
+00:10:57.200 like you want to explain a regression to
+00:10:59.600 someone chances are the boston housing
+00:11:01.600 data set figured somewhere you want to
+00:11:03.440 explain classification
+00:11:05.440 uh well when i was a student it was the
+00:11:07.200 iris data set these days it's probably
+00:11:09.680 cipher or or something like this
+00:11:12.240 in time series one of those classic data
+00:11:14.480 sets that everyone use is number of
+00:11:16.240 passengers flying out of in and out of
+00:11:18.320 australia
+00:11:19.519 over the yeah 20 years of the post-war
+00:11:22.160 period
+00:11:23.680 this is what you see here
+00:11:25.519 uh the reason this is such a nice data
+00:11:27.839 set is that
+00:11:29.200 it exhibits a bunch of characteristics
+00:11:31.040 in a fairly regular manner you see the
+00:11:34.320 level is increasing which means there is
+00:11:36.480 some sort of trend
+00:11:38.000 there is a repetitive pattern occurring
+00:11:40.640 which means there's probably some kind
+00:11:42.160 of seasonality
+00:11:44.000 and there's not a lot of noise
+00:11:47.040 what can we do about it
+00:11:49.440 and this is where we get our first
+00:11:52.240 encounter with one of the primary tools
+00:11:56.079 to be used in time series analysis and
+00:11:58.399 namely the composition so you can you
+00:12:00.480 can you might encounter it under name
+00:12:02.320 structural decomposition or something
+00:12:04.639 like this the basic idea is
+00:12:07.200 any process
+00:12:09.040 or time series you can decompose it into
+00:12:11.680 a trend
+00:12:12.959 some sort of long-term progression say
+00:12:16.240 you look at the number of
+00:12:18.160 people flying say by airplanes well
+00:12:20.160 there's more people over time most
+00:12:22.000 countries grow in size chances are
+00:12:25.760 under even if it's the same proportion
+00:12:27.200 there's physically more people going to
+00:12:28.880 the airport to fly
+00:12:30.720 uh
+00:12:32.000 st the seasonal component
+00:12:35.120 uh
+00:12:36.160 well think sales sales of ice cream is
+00:12:39.760 gonna be heavily seasonal
+00:12:41.760 sales of uh
+00:12:44.240 christmas articles it's coming to be
+00:12:46.720 quite seasonal as well uh those kinds of
+00:12:49.120 things the important bit to to remember
+00:12:52.160 the
+00:12:53.120 uh period over which the uh
+00:12:56.560 the seasonality occurs is fixed
+00:12:59.760 it's deterministic and it's not a priori
+00:13:02.720 occasionally people especially if you're
+00:13:05.200 talking about uh
+00:13:06.800 economic time series also add a cycle
+00:13:09.440 component which is pretty much seasonal
+00:13:11.920 component but where the period is
+00:13:13.600 undetermined
+00:13:14.959 like it i mean it's only known
+00:13:16.560 approximately like for instance in
+00:13:17.920 economics you can have the would you
+00:13:19.920 call it the condrative cycles which in
+00:13:22.079 which can be like 11 years but they can
+00:13:24.160 be 13 but occasionally 10. so ballpark
+00:13:27.200 we are there but it's not fixed
+00:13:29.279 i decided to skip it from the overall
+00:13:31.600 exposition because it just confuses
+00:13:33.680 things
+00:13:34.880 but be prepared that you might encounter
+00:13:36.800 it and so you have trend you have
+00:13:39.120 seasonality and you have pretty much
+00:13:41.199 everything else
+00:13:42.560 people might call it sometimes irregular
+00:13:44.480 component residual component model error
+00:13:47.760 everything else that doesn't fit does it
+00:13:50.079 that is not captured by trend and
+00:13:51.839 seasonality we are saying okay that's
+00:13:53.680 noise or at least that's what we hope
+00:13:55.440 for
+00:13:56.880 so what can we what happens when we
+00:13:58.480 apply this decomposition to our
+00:14:01.120 uh passengers data series well there's a
+00:14:03.680 clear growing trend
+00:14:06.560 very monotone
+00:14:08.160 close to linear
+00:14:09.760 this is a repetitive seasonal seasonal
+00:14:11.760 pattern that's all right
+00:14:13.680 and then we have the
+00:14:15.760 residuals
+00:14:18.320 sorry
+00:14:20.240 uh and this is where we are less happy
+00:14:23.519 because
+00:14:24.880 if you look conrad we do
+00:14:26.959 we do have a question coming in sorry to
+00:14:28.959 interrupt you yes
+00:14:30.959 so the question is how is trend and
+00:14:32.560 seasonality different can you an example
+00:14:34.959 or two
+00:14:36.720 of course uh trend
+00:14:39.279 well seasonality is everything where you
+00:14:41.440 know that this is or you have reasonable
+00:14:43.360 reason to believe is in bodies and i'm
+00:14:45.360 so sorry english is not my first
+00:14:46.639 language you have reason to believe that
+00:14:48.880 this will the phenomenon will repeat
+00:14:51.040 itself
+00:14:52.639 over the same interval
+00:14:54.639 like
+00:14:56.079 uh
+00:14:57.440 yeah well
+00:14:58.480 sales of heavily seasonal articles in
+00:15:00.880 the year those kinds of things
+00:15:03.120 uh ice cream uh i don't know bathing
+00:15:06.160 suits in the summer assuming well when
+00:15:08.480 whenever summer happens in you wherever
+00:15:10.800 you live uh christmas articles this is
+00:15:13.839 something say christmas articles they
+00:15:15.199 will always peak like throughout
+00:15:16.880 december
+00:15:18.079 maybe some people carry it okay over the
+00:15:20.000 moon into january and then it's going to
+00:15:21.680 flood like the rest of the year
+00:15:23.839 or
+00:15:24.639 in the context of uh
+00:15:26.800 the seasonality here in flight can we
+00:15:29.279 map this to months i think there's a
+00:15:30.800 solid chance that the big peak is
+00:15:32.320 probably something around christmas
+00:15:34.320 that's when a lot of our holiday when a
+00:15:36.480 lot of people travel and the smaller
+00:15:38.480 ones that also repeat are situations
+00:15:40.320 where people are flying throughout the
+00:15:41.680 year
+00:15:42.800 i don't know some minor holidays that
+00:15:44.480 are not so global in nature so that
+00:15:46.320 would be seasonality trend is pretty
+00:15:49.440 much everything that you can reasonably
+00:15:51.680 approximate as deterministic say you
+00:15:54.000 look at number
+00:15:55.839 of
+00:15:58.399 uh
+00:15:59.600 users of an uh of a certain website or a
+00:16:02.720 platform
+00:16:04.000 uh chances are
+00:16:06.079 if we know that in a given country 80
+00:16:08.000 percent of people use the internet
+00:16:10.480 and the population of the country is
+00:16:12.480 growing at 5
+00:16:13.920 annually
+00:16:15.120 taking a ridiculous number obviously
+00:16:17.519 then
+00:16:18.399 the number of users will also keep
+00:16:20.480 growing at that rate and it's pretty
+00:16:22.480 deterministic i mean it's not ideally
+00:16:24.880 deterministic of course but it's
+00:16:26.399 something that we can kinda capture that
+00:16:28.240 way
+00:16:29.759 i hope that answers the question if not
+00:16:32.240 feel free to think back
+00:16:37.279 shall we continue or is there another
+00:16:39.040 one yes yes let's continue there is
+00:16:41.199 another question but i i think
+00:16:43.759 we should take it towards the end
+00:16:45.680 because
+00:16:46.880 um
+00:16:48.160 it's about how to approach a problem
+00:16:51.040 so again i i promise to take that in at
+00:16:54.240 the end sure okay uh
+00:16:56.959 the the relevant bit here if you look at
+00:16:59.040 the lowest panel residuals
+00:17:01.279 they are quite they the magnitude of the
+00:17:04.480 jumps is quite high at the third at the
+00:17:06.319 early part of the sample and towards the
+00:17:08.160 late part of the sample it's almost flat
+00:17:10.640 if you go from like 60 to 100
+00:17:12.240 observations which means very variance
+00:17:15.679 of your observations changes over time
+00:17:18.319 that's not noise one of the crucial
+00:17:20.079 things about noise means the variance is
+00:17:22.959 constant over time which means in this
+00:17:25.039 instance the additive decomposition
+00:17:28.000 fails to capture something important
+00:17:29.679 about the process
+00:17:31.120 oh biggie we can reformulate it into
+00:17:33.200 multiplicative decomposition
+00:17:36.720 which means effectively you can think of
+00:17:39.120 it as slapping logarithm on everything
+00:17:41.120 and then decomposing because well if
+00:17:43.360 it's multiplicative then it's additive
+00:17:45.039 in logarithmic space
+00:17:48.320 lo and behold well i'm not that
+00:17:49.919 surprised because i chose this example
+00:17:51.600 to demonstrate my point
+00:17:55.440 the behavior of the process itself
+00:17:57.200 hasn't changed that much neither has the
+00:17:58.880 trend but
+00:18:00.400 residuals are much better behaved
+00:18:02.960 far less variation
+00:18:07.200 i'm sorry to interrupt again but would
+00:18:08.880 you mind clicking on the hide button
+00:18:11.520 that says
+00:18:12.799 yes of course
+00:18:14.720 it's uh it's on the graph
+00:18:17.039 okay
+00:18:18.559 better
+00:18:20.240 yeah much better thank you very much of
+00:18:22.080 course
+00:18:23.440 yeah i was sorry i didn't realize this
+00:18:25.120 was showing uh
+00:18:26.799 as well uh okay
+00:18:29.280 wrapping up the groundwork part more
+00:18:31.440 more fun with the basics
+00:18:33.360 uh two important uh
+00:18:35.840 concepts that are kind of outside the
+00:18:37.520 scope of this one
+00:18:39.039 is autocorrelation stationarity
+00:18:41.679 stationarity translated to plain english
+00:18:44.400 is pretty much saying
+00:18:45.840 uh
+00:18:47.200 yes stuff is random
+00:18:49.440 but the randomness tomorrow is similar
+00:18:51.440 to the randomness today
+00:18:54.880 and it or and if it if it's not then how
+00:18:57.760 does it change autocorrelation is an
+00:19:00.160 approximation to the idea in order to be
+00:19:02.480 able to predict something the process
+00:19:04.799 must have some kind of memory which
+00:19:06.960 means there must be some relationship
+00:19:08.720 between what happened today and what
+00:19:10.240 happened yesterday because if we're
+00:19:11.919 trying to build daily forecasts and
+00:19:13.679 every day is completely independent from
+00:19:15.760 everything else
+00:19:17.039 yeah
+00:19:18.000 we can't predict anything because
+00:19:19.919 there's just no there's just no in no
+00:19:22.480 past information for us to exploit
+00:19:25.600 for more details
+00:19:27.200 part one of the of the notebook series
+00:19:31.840 okay so we'd like to do some forecasting
+00:19:34.799 enter exponential smoothing
+00:19:36.960 uh
+00:19:38.480 kind of like
+00:19:39.919 if you're looking at statistical models
+00:19:42.320 the method that you start with is linear
+00:19:45.520 regression
+00:19:46.799 then in time series forecasting that's
+00:19:48.240 going to be exponential smoothing this
+00:19:50.160 is like
+00:19:51.200 the uh i don't know
+00:19:53.760 swiss army swiss army pocket knife or
+00:19:56.160 something
+00:19:58.000 it just works pretty much everywhere
+00:20:00.000 it's been introduced million years ago
+00:20:02.159 well 80 really but you see my point uh
+00:20:06.640 it's the vintage method to refer to
+00:20:09.919 the basic idea
+00:20:12.080 each prediction is a combination of past
+00:20:14.880 observations
+00:20:16.320 and those weights the further
+00:20:19.440 you go back into the past the faster
+00:20:21.440 they did they shrink
+00:20:23.440 i they are exponential decay in the
+00:20:26.159 weights
+00:20:27.360 uh the brilliant part of this
+00:20:29.840 of this minimal requirements
+00:20:32.320 minimal to set up minimal to estimate
+00:20:34.320 meanwhile to implement in practice like
+00:20:36.000 if you are really in that kind of
+00:20:37.840 position in life you can you can and i
+00:20:39.840 have done it
+00:20:41.200 uh if you have to not by choice trust me
+00:20:43.760 you can implement
+00:20:45.919 exponentials moving in excel and it
+00:20:47.919 actually works
+00:20:49.840 uh
+00:20:51.440 exponential smoothing models had a kind
+00:20:53.200 of interesting cycle
+00:20:54.880 life cycle because they were their great
+00:20:57.360 thing for the 50s and 60s then they kind
+00:21:00.480 of fell into absolution because you know
+00:21:02.799 better computers became available and
+00:21:05.200 people started being able to estimate
+00:21:06.880 better time series models
+00:21:10.480 where we didn't have to worry about
+00:21:11.919 having minimal memory footprint
+00:21:13.919 but then they came back with a vengeance
+00:21:15.840 because
+00:21:16.880 if you are
+00:21:18.640 well ecommerce website like a de vinta
+00:21:20.320 to use a good example
+00:21:22.000 and you need to generate predictions
+00:21:23.679 quickly you don't have time to make an
+00:21:26.080 expensive call
+00:21:27.760 to well unless you are google facebook
+00:21:29.919 or nsa unless you have that kind of
+00:21:31.919 infrastructure you don't have the time
+00:21:33.760 to make an expensive call to a big deep
+00:21:35.280 learning model
+00:21:36.480 and then
+00:21:38.559 reevaluate it
+00:21:40.080 you need something that can be done
+00:21:41.440 quickly ideally within the database or
+00:21:44.559 glorified database like elasticsearch
+00:21:47.679 and this is where exponential smoothing
+00:21:49.280 models come back in because the forecast
+00:21:51.679 that we'll see in a sec is a combination
+00:21:53.919 of two things that are either available
+00:21:55.440 at execution
+00:21:56.880 or can be pre-computed which means you
+00:21:59.039 can bake it into a sql query
+00:22:02.000 with zero concern for full-blown
+00:22:04.240 engineering data science infrastructure
+00:22:06.240 behind it etc and that that's what
+00:22:08.720 enabled their comeback especially in
+00:22:10.640 contexts like uh algorithmic trading
+00:22:14.320 uh
+00:22:15.440 the actual formula that i was referring
+00:22:17.280 to assuming uh by the way disclaimer
+00:22:20.400 throughout everything i'm saying
+00:22:22.880 xt denotes the time series that we are
+00:22:25.440 actually interested in
+00:22:27.470 [Music]
+00:22:28.799 xd is our time series st is our smooth
+00:22:31.840 version using single exponential
+00:22:33.760 smoothing the aka brown method
+00:22:36.640 and the idea is if you look at the
+00:22:38.000 formula here
+00:22:39.520 says
+00:22:40.400 alpha is a constant between zero and one
+00:22:42.640 alpha times the current value of the
+00:22:44.480 time series is one minus alpha times the
+00:22:47.200 previous smooth version
+00:22:49.039 or you can think of it as
+00:22:51.440 current smooth observation is the
+00:22:53.760 previous smooth observation
+00:22:56.240 plus some portion of the error from the
+00:22:59.120 previous step namely how different our
+00:23:01.600 smooth prediction was from the actual
+00:23:03.760 observation
+00:23:06.480 the reason this is the reason this is
+00:23:08.159 important this allows you to balance
+00:23:10.159 essentially how much you care
+00:23:12.159 about recency versus smoothing higher
+00:23:14.960 alpha
+00:23:15.919 you're more focused on the recent
+00:23:17.280 observations lower alpha you focus more
+00:23:20.320 on the on the smooth pass
+00:23:23.280 this will become more clear from a graph
+00:23:25.919 or two in a sec
+00:23:28.640 yeah simple way the average of the past
+00:23:30.720 in the present
+00:23:33.200 important bit here
+00:23:36.640 this allows you to produce an automatic
+00:23:38.880 forecast arbitrarily far into the future
+00:23:41.440 just edge steps into the future if you
+00:23:43.679 keep iterating formula free
+00:23:46.080 on itself recursively
+00:23:48.159 then once you run out of observations
+00:23:50.240 then your most recent smooth version
+00:23:53.520 that's your flat observation going
+00:23:55.120 forward
+00:23:57.360 uh
+00:23:58.559 the recency versus moving
+00:24:00.559 if we have a very small alpha as i
+00:24:02.799 mentioned earlier well as you can see
+00:24:05.600 blue is the original series red is the
+00:24:07.919 smooth one
+00:24:09.679 pretty much gets rid of most of the
+00:24:11.520 variation
+00:24:13.039 follows kind of the general behavior and
+00:24:15.679 then from a certain point onward it flat
+00:24:17.600 lines
+00:24:19.520 if we increase the alpha
+00:24:21.679 it follows this series a bit more
+00:24:24.000 closely so there is less focus on this
+00:24:26.159 previous smooth version and more on the
+00:24:28.720 more recent observations
+00:24:30.880 and if we push the alpha to 0.9
+00:24:34.240 then this then this practically not
+00:24:36.880 entirely because it's still 0.9 and not
+00:24:39.440 not one
+00:24:40.480 replicates the behavior of the series
+00:24:43.039 but if you notice
+00:24:45.039 there's a lag
+00:24:47.039 this is because
+00:24:51.919 this observation
+00:24:53.360 depends the
+00:24:55.440 new smooth one depends on the previous
+00:24:57.200 smooth one
+00:24:58.640 and rescaling and that's why we don't
+00:25:00.559 replicate it immediately replicated with
+00:25:02.880 a lag
+00:25:04.799 what can we do about predicting
+00:25:06.640 something with a uh
+00:25:09.360 single exponential smoothing
+00:25:12.720 by the way i'd like to say i apologize
+00:25:15.039 from the bottom of my heart uh for the
+00:25:17.440 way this slide looks
+00:25:19.120 but i'm totally out of shape when it
+00:25:20.880 comes to magnum
+00:25:22.480 and
+00:25:23.279 uh
+00:25:24.320 i was like yeah this is gonna work i
+00:25:25.760 just did screenshots and then i looked
+00:25:27.840 at it
+00:25:28.720 and i realized i don't remember how to
+00:25:30.559 set up a code block anymore
+00:25:32.559 so i decided so i apologize for that
+00:25:34.640 promise to do better next time
+00:25:38.080 we'll keep working with the passengers
+00:25:39.760 data set
+00:25:41.679 how can we do it in stats models stats
+00:25:44.320 models a moment of introduction stats
+00:25:46.559 models is pretty much the goal to
+00:25:48.799 package when it comes to
+00:25:52.000 classic statistical methods
+00:25:53.919 well
+00:25:55.120 up until three moments three months ago
+00:25:57.520 or so anyway when cass was introduced
+00:25:59.840 spoiler alert and i'll mention that
+00:26:01.360 later
+00:26:02.320 which
+00:26:03.200 on the one hand introduced incorporates
+00:26:06.000 lstm
+00:26:07.440 on the other it also has exponential
+00:26:09.600 some exponential smoothing
+00:26:11.440 uh but until that point stats bundles
+00:26:14.159 was pretty much their place the place to
+00:26:16.080 go which
+00:26:17.520 uh
+00:26:18.320 kind of explains why the syntax is not
+00:26:21.760 exactly the most obvious at times at
+00:26:23.840 least it wasn't for me i remember
+00:26:25.120 reading documentation and going like
+00:26:27.600 good gracious 1990s called they want
+00:26:29.919 this there they won their style guide
+00:26:31.520 back
+00:26:32.799 so what we got here
+00:26:37.039 we read the data the usual
+00:26:39.200 we plot the series
+00:26:41.760 we
+00:26:43.120 instantiate an object with this data set
+00:26:46.000 as an argument
+00:26:48.159 we call fit with usual parameters
+00:26:51.600 prediction number of steps ahead
+00:26:54.240 plot tada
+00:26:55.919 this is what it looks like
+00:26:58.080 uh
+00:26:59.279 two things to observe
+00:27:01.120 one as
+00:27:02.880 same as earlier
+00:27:04.240 there is the lag going on
+00:27:07.679 b
+00:27:08.400 from a certain point onwards if it flat
+00:27:10.799 lines
+00:27:12.080 uh
+00:27:13.039 it's nice that it replicates the
+00:27:14.960 behavior a little even if it's
+00:27:16.480 progressively the higher the peaks go
+00:27:18.720 the more it's missing them but let's be
+00:27:20.720 honest a completely flat forecast going
+00:27:22.960 forward that's not super useful
+00:27:25.760 so what can we do about it
+00:27:27.600 well
+00:27:29.360 it worked for the level of the process
+00:27:31.200 the exponential's moving so
+00:27:33.200 mr holt was like
+00:27:35.440 well let's see if we can just move the
+00:27:37.360 trend and then see what happens
+00:27:39.520 low and behold that's precisely what it
+00:27:41.200 did uh for double exponential smoothing
+00:27:43.679 it's the halt method you don't have a
+00:27:46.240 single equation you have two one for the
+00:27:48.480 series itself and a separate one just
+00:27:51.200 for the trend
+00:27:53.760 the smooth level and smooth trend
+00:27:58.720 exactly still there because i had some
+00:28:00.559 noise on the line for a moment
+00:28:03.440 so there is a question related to
+00:28:06.399 uh smoothing
+00:28:07.919 exponential smoothing so
+00:28:09.919 uh house
+00:28:11.120 one
+00:28:12.640 i'm sorry
+00:28:13.760 this one or the previous one
+00:28:15.760 oh actually it was asked a little bit uh
+00:28:17.919 before
+00:28:19.120 okay
+00:28:20.480 so
+00:28:21.279 i'll just jump back
+00:28:23.840 sure the question is how safe is
+00:28:25.919 exponential smoothing or window shifting
+00:28:27.840 methods for irregular time series
+00:28:31.279 or the ones with s signal
+00:28:33.679 where noise might be high so safe
+00:28:36.720 by safe the person means foolproof
+00:28:40.640 okay there's nothing foolproof
+00:28:43.520 there is nothing foolproof in this world
+00:28:45.200 no i kid you not i kid you not every i'm
+00:28:47.520 not trying to be cute
+00:28:49.440 i i really mean it
+00:28:51.360 uh
+00:28:52.640 the
+00:28:53.600 reason this is not complete this is not
+00:28:55.600 full proof is the following
+00:28:57.440 you have a bunch of methods in
+00:28:59.440 statistics machine learning you name it
+00:29:01.760 where if you do something wrong
+00:29:04.240 things are going to blow up
+00:29:06.159 because your objective function will
+00:29:08.000 just reach to infinity you'll get
+00:29:09.840 segmentation fault and whatnot uh
+00:29:13.360 exponential smoothing is not one of
+00:29:14.799 those methods you can always fit some
+00:29:17.039 sort of constant
+00:29:18.480 to to to mimic it as closely as possible
+00:29:21.120 so that's regarded me so in that sense
+00:29:24.320 if you know that when you do something
+00:29:26.159 wrong
+00:29:27.039 uh well the whole thing is gonna crash
+00:29:29.039 it is pretty foolproof because when
+00:29:30.799 things crash in front of you you know
+00:29:32.799 something went wrong
+00:29:34.320 uh on the other hand uh if if they don't
+00:29:37.279 crash they're not guaranteed to crash
+00:29:38.880 they it's not foolproof and in terms of
+00:29:40.960 irregular series do you mean there are
+00:29:43.279 missing observations in between or that
+00:29:45.440 the noise is high
+00:29:47.360 yeah so so uh
+00:29:49.120 the ones with less signal and a high
+00:29:51.039 noise noise might be high
+00:29:55.440 they will get you somewhere
+00:29:57.360 i mean
+00:29:58.320 everything all this everything where
+00:30:00.080 every single situation when you are
+00:30:01.520 dealing with high proportion of noise is
+00:30:03.520 about getting rid of that noise in a
+00:30:05.679 manner that you know
+00:30:07.520 you get rid of as much as you want to
+00:30:09.919 but not more than that
+00:30:11.520 so if you clean up the signal a little
+00:30:13.440 bit and this is a form of cleaning up
+00:30:17.279 so
+00:30:19.120 yeah
+00:30:20.080 i think it should be fine like i said
+00:30:22.720 with the cave ad that
+00:30:24.799 have a look for to start well things
+00:30:26.320 like is your data set big enough
+00:30:29.120 like it's not exactly proper math
+00:30:32.240 but the kind of rule of thumb
+00:30:34.559 is that i mean keep in mind
+00:30:37.120 exponential smoothing
+00:30:38.880 it's it's a recursive method which as
+00:30:41.520 usual is the case with recursive methods
+00:30:43.679 it's a it needs a little bit of time to
+00:30:45.200 catch up
+00:30:46.480 which means your series cannot be too
+00:30:49.840 and the kind of rule of thumb is that
+00:30:51.760 for a given uh for a given alpha you
+00:30:54.880 need three over alpha observations for
+00:30:57.200 this thing to stabilize
+00:31:00.399 uh yeah i know it's it's a bunch of
+00:31:02.799 heuristics but let's be honest that's
+00:31:05.120 the best we can do in a situation like
+00:31:06.640 this
+00:31:09.519 i hope that answers the question
+00:31:12.240 yeah i think it does so
+00:31:14.240 let's let's carry on okay
+00:31:16.799 uh forecast uh
+00:31:20.000 eight steps going forward is the most
+00:31:22.000 recent smooth observation plus h times
+00:31:24.640 the most recent version of the smooth
+00:31:26.159 trend
+00:31:27.519 what does it look
+00:31:28.799 i'm so sorry
+00:31:30.080 what's it look like in practice
+00:31:33.760 uh well this is pretty this is pretty
+00:31:35.760 much copied from the previous block so
+00:31:37.360 i'm not going to discuss this one an
+00:31:38.640 awful lot
+00:31:40.399 and then we have
+00:31:42.399 the double exponentials moving part so
+00:31:45.039 hold method
+00:31:47.120 similar syntax although why did they
+00:31:48.880 call one simple exponentials moving and
+00:31:50.799 the other hold and not double as beyond
+00:31:53.360 me
+00:31:55.030 [Music]
+00:31:56.240 and this is what you get this is the
+00:31:57.760 picture which you already saw and you're
+00:31:59.279 familiar with the forecast that just
+00:32:01.360 flat lines from a certain point onward
+00:32:04.240 and then this is what happens when we
+00:32:06.159 apply double exponentials moving
+00:32:08.640 so
+00:32:09.519 good news
+00:32:11.360 we are not undershooting anymore with
+00:32:13.679 respect to the variation
+00:32:15.919 uh bad news number one we are
+00:32:17.760 overshooting more and more substantially
+00:32:20.320 even more importantly
+00:32:22.240 if you care at least a little about
+00:32:24.399 reality what this method does it
+00:32:26.720 extrapolates the most recent no sorry
+00:32:29.279 yeah extrapolates for example the most
+00:32:31.440 recent trend
+00:32:32.880 down
+00:32:33.760 in indefinitely
+00:32:36.399 which means pretty sure we're gonna get
+00:32:37.840 negative number of passengers
+00:32:40.559 not good
+00:32:42.880 not good
+00:32:44.159 so what do we do if the trick worked
+00:32:46.399 once why not try to make it work twice
+00:32:49.120 we go from double to triple exponentials
+00:32:51.679 moving aka hold winter's method if
+00:32:54.159 memory serves winters was holds phd
+00:32:56.720 student or something like this and they
+00:32:58.159 worked on this one together
+00:33:00.240 uh
+00:33:01.919 well the first one is kind of similar as
+00:33:03.760 before
+00:33:05.120 a smooth version of the series corrected
+00:33:08.399 by the seasonal component and here comes
+00:33:10.960 the trend component then there's the
+00:33:13.120 equation for the trend which is
+00:33:14.640 unchanged and the new new one compared
+00:33:17.360 to double is this one equation number
+00:33:20.159 nine
+00:33:21.039 for the seasonal component
+00:33:25.200 seasonal capital l
+00:33:27.919 that's the
+00:33:30.000 period that's the seasonality that we
+00:33:32.880 are expecting in the data nine out of
+00:33:35.279 ten cases if you see this in practical
+00:33:37.279 applications this stuff is going to
+00:33:38.960 refer to monthly data since we're
+00:33:40.960 talking annual seasonality which means l
+00:33:42.880 is 12.
+00:33:44.559 uh occasionally if quarterly then l is 4
+00:33:47.120 but that's about it
+00:33:48.960 this is not a
+00:33:51.440 this is not at times this is not an
+00:33:53.120 exponential smoothing consideration per
+00:33:55.120 se but more a general remark about any
+00:33:57.679 model where you are trying to fit
+00:33:59.440 seasonality
+00:34:00.880 please please pretty please in the name
+00:34:03.440 of all that's good and beautiful in this
+00:34:04.799 world if you want to estimate
+00:34:07.200 seasonality of pattern
+00:34:09.119 say l
+00:34:10.719 make sure you have at least two full
+00:34:12.960 cycles in your data
+00:34:15.199 because otherwise bad things are just
+00:34:17.199 lurking waiting for you to have working
+00:34:19.119 waiting to happen to you
+00:34:21.520 uh forecast from this model going
+00:34:23.839 forward most recent uh
+00:34:26.800 smooth version of the level plus
+00:34:28.960 extrapolation of
+00:34:31.199 of the trend of the most recent trend
+00:34:33.599 plus
+00:34:34.560 the appropriate seasonal component
+00:34:36.960 what this transform translates to in
+00:34:38.639 practice this is what we started with
+00:34:41.520 this is this this was the improvement we
+00:34:43.520 got with um
+00:34:46.480 double exponential smoothing
+00:34:48.719 and this is what we get
+00:34:50.399 when we get triple exponentials moving
+00:34:52.159 so we take care of the level
+00:34:54.239 the trend and the seasonality
+00:34:57.280 i mean it's not perfect
+00:34:59.599 but
+00:35:00.720 it's kind of getting you at least in the
+00:35:03.200 you know
+00:35:04.640 socially acceptable direction
+00:35:10.480 with the previous slide uh
+00:35:12.560 does it start over fitting at this point
+00:35:17.200 uh it might
+00:35:19.200 it might yes
+00:35:20.960 well the question the thing is uh
+00:35:23.680 well how much data do we have
+00:35:26.079 if we
+00:35:26.960 but yes in general the thing to keep in
+00:35:29.200 mind here
+00:35:30.960 uh
+00:35:32.400 unlike machine learning methods or
+00:35:36.240 other time series methods say arima and
+00:35:38.480 whatnot
+00:35:39.839 this one does not really have a model
+00:35:41.920 this is effectively a glorified exercise
+00:35:44.160 in curve feeding
+00:35:45.760 so yes
+00:35:46.880 yes there is a risk that this will start
+00:35:48.800 overfitting at some point
+00:35:50.720 it's not that apparent here yet
+00:35:53.440 uh because well
+00:35:55.760 the past australian passengers data set
+00:35:58.240 is kind of
+00:35:59.520 selected to to make a point
+00:36:02.079 but yes
+00:36:03.200 yes that's why you kind of have to be
+00:36:04.720 careful also with exponential smoothing
+00:36:07.440 the problem is not as big as you know
+00:36:09.920 with overfitting as you would with you
+00:36:12.480 get with i don't know
+00:36:14.160 uh
+00:36:15.720 non-regularized linear model with
+00:36:19.200 collinear variables it's not that bad
+00:36:21.920 but yeah the issue is
+00:36:24.839 there okay and another question that we
+00:36:27.520 have
+00:36:28.480 now is is it because of the nequist
+00:36:30.320 limit that we demand sample size double
+00:36:32.480 the size of the period
+00:36:35.040 is it because of what i'm sorry
+00:36:37.440 so sorry i might not be pronouncing it
+00:36:39.200 right but nyquist limit
+00:36:42.320 uh probably
+00:36:44.240 probably it's been a while since i've
+00:36:45.680 been it's been a while since i've been
+00:36:47.599 looking it from that angle
+00:36:49.440 uh but
+00:36:51.040 from what i do recall yeah although the
+00:36:54.640 less formal explanation i always like to
+00:36:56.800 use is
+00:36:58.480 well if you want to know
+00:37:01.200 whether something that happens say
+00:37:03.440 throughout i don't know january to
+00:37:05.040 february is a seasonal effect or not
+00:37:08.160 then you need at least two cycles to sit
+00:37:10.480 to see
+00:37:11.599 because if i only observe
+00:37:14.320 uh i don't know 10 months of a year
+00:37:17.200 i have absolutely no way of knowing say
+00:37:20.160 taking as an example i live in the
+00:37:21.920 netherlands which is northern europe
+00:37:24.160 hence northern hemisphere
+00:37:26.160 as far as we're concerned summer is what
+00:37:28.720 happens well
+00:37:30.079 even for dutch standards
+00:37:31.839 uh starting with june which means it
+00:37:34.160 gets a little warmer before that
+00:37:36.480 how do i know that well because i've
+00:37:38.480 been living here a while
+00:37:40.720 however if i had only lived here for 10
+00:37:42.880 months and i only saw one spring i have
+00:37:45.760 no way of knowing whether the change in
+00:37:48.079 temperature that's okay is it a seasonal
+00:37:49.920 pattern in this period
+00:37:52.160 or is it a ongoing trend and by november
+00:37:55.040 i should start panicking the global
+00:37:56.560 warming is going to kill me i have no
+00:37:58.720 way of knowing it because i have not
+00:38:00.400 seen a full cycle materialize at least
+00:38:02.560 twice
+00:38:05.520 but yes i mean i had i admit talking
+00:38:07.760 about nucleus in this context is
+00:38:09.200 probably a more elegant explanation
+00:38:11.839 okay uh another another question that we
+00:38:14.000 have sorry i i have a couple of
+00:38:16.160 questions here
+00:38:17.440 so
+00:38:18.480 okay so
+00:38:19.760 biggest nightmare for every presenter is
+00:38:21.760 that you're talking and talking and
+00:38:22.960 there's nothing but that silence
+00:38:25.680 yeah true so uh is it advisable to use
+00:38:28.800 cross validation for hyper parameter
+00:38:30.480 estimation in exponential algorithms
+00:38:34.320 uh cross validation out of the box no
+00:38:38.800 i'm always that's my default answer
+00:38:40.880 cross validation in time series no
+00:38:43.440 not a
+00:38:44.400 validation by all means if you can if
+00:38:47.200 you can be bothered yes
+00:38:48.960 if you have time to mess around with
+00:38:50.480 that sure find the number of parameters
+00:38:53.119 and treat it the way you would in the
+00:38:54.880 other hyper parameter yes
+00:38:57.119 so you're saying
+00:38:59.440 some kind of holdout set
+00:39:01.760 yes
+00:39:02.560 okay
+00:39:03.920 very much
+00:39:04.960 uh i mean
+00:39:07.280 if i remember correctly i have i have
+00:39:10.079 this mapped out the validation methods
+00:39:12.320 for time series i think for module 7 or
+00:39:14.480 something like this
+00:39:16.079 the only tiny issue in the meantime i
+00:39:18.000 just need to find the time
+00:39:19.680 uh pun intended uh
+00:39:21.680 but yes
+00:39:23.040 i i am aware that this is something
+00:39:25.119 that's not super obvious to people i
+00:39:27.359 mean just to give a trailer preview
+00:39:30.240 cross validation out of the box
+00:39:32.880 is cool if you are sure that time
+00:39:35.200 doesn't matter
+00:39:36.960 which is fine if you are for instance
+00:39:38.560 talking about i don't know uh
+00:39:41.359 segmentation of segmentation or
+00:39:43.359 classification of images those kinds of
+00:39:45.280 things
+00:39:46.480 then the time dimension isn't really
+00:39:48.720 germane to your problem
+00:39:50.400 however in type series problems by its
+00:39:53.359 very nature practically it is and so if
+00:39:56.480 you are crossed by this is always a risk
+00:39:58.079 that you are effectively looking into
+00:39:59.760 the future and then using it to back
+00:40:01.680 that to evaluate the past
+00:40:03.839 uh of course you're gonna get fantastic
+00:40:05.440 results
+00:40:06.880 there's also a long list of bad things
+00:40:09.119 that will happen to you but yeah that's
+00:40:11.040 that's why i say i mean sometimes you
+00:40:13.040 can get away with it but those are very
+00:40:15.040 very special cases and exceptions
+00:40:17.359 in general validation times yourself say
+00:40:19.440 holdout said better still if you have
+00:40:21.920 time
+00:40:22.880 uh which is what's it hindman called it
+00:40:27.359 like a rolling holdout set pretty much
+00:40:30.240 so you have 100 observations you feature
+00:40:32.800 model on 1 to 80 and then validate on
+00:40:35.119 the last 20
+00:40:36.720 and then you shift it and you fit on
+00:40:39.200 observations 2 until 81
+00:40:41.680 and then validate on the rest and keep
+00:40:43.760 rolling keep moving your training set
+00:40:45.440 and your hold outside ahead of it
+00:40:46.960 forward
+00:40:48.880 yeah like sliding window the person
+00:40:50.800 mentions
+00:40:52.560 thank you thank you that's the phrase
+00:40:54.160 that all with me
+00:40:56.079 thank you
+00:40:57.440 so
+00:40:58.160 before we move on there's uh also one
+00:41:00.560 one one more question
+00:41:02.880 and uh
+00:41:04.720 it's about level trend and seasonality
+00:41:08.240 and the person wants to know what does
+00:41:10.000 level refer to
+00:41:13.200 uh
+00:41:14.079 a constant
+00:41:15.599 think of it if you think of it
+00:41:17.920 in relationship to no actually no the
+00:41:20.960 analogy to calculus is is is a horrible
+00:41:23.599 one
+00:41:24.640 uh let's see if i can
+00:41:26.960 go back to some uh
+00:41:32.800 yeah that's kind of horrible
+00:41:34.400 but it will have to do
+00:41:36.480 level
+00:41:37.839 you can think of it like
+00:41:39.440 well for for something that wouldn't
+00:41:41.520 that didn't have a trend a level would
+00:41:43.839 oh no i know
+00:41:50.079 yes
+00:41:51.359 that's what i wanted
+00:41:53.040 level
+00:41:54.240 uh this series more or less oscillates
+00:41:56.560 around zero
+00:41:58.240 it has a which means
+00:42:00.560 it's not super formal explanation but we
+00:42:02.960 are talking about intuition here which
+00:42:04.880 means it has a constant level of zero
+00:42:07.040 and this level doesn't change
+00:42:08.960 uh a little later assuming we manage to
+00:42:11.119 squeeze it time wise we're also going to
+00:42:13.119 talk about uh
+00:42:14.800 changing level in the series
+00:42:16.960 uh but
+00:42:19.359 this is a level because there's no
+00:42:22.400 well think of it like this if you take
+00:42:24.800 an average of the series
+00:42:26.800 over this interval and this one and this
+00:42:29.760 one and this one it's probably going to
+00:42:31.839 be pretty similar
+00:42:33.920 okay this one might be a little
+00:42:35.440 different because there's huge swings
+00:42:37.359 but up to this point
+00:42:39.440 actually no average will probably will
+00:42:41.040 be fine volatility will go through the
+00:42:42.640 roof
+00:42:43.520 but on average
+00:42:45.119 there's like variations around zero
+00:42:46.880 which means the level is constant here
+00:42:49.599 by contrast if you look at the
+00:42:54.240 triple one
+00:42:55.920 an average here would probably be
+00:42:57.760 something like 150
+00:42:59.520 android year
+00:43:01.119 ballpark 250 350 etc which means the
+00:43:05.359 level of your series changes it keeps
+00:43:07.599 going upward
+00:43:09.040 which means it's not constant or at
+00:43:10.800 least it's only locally constant but
+00:43:12.400 overall it's increasing
+00:43:14.160 and that's where the trend comes in
+00:43:15.839 trend pretty much says okay
+00:43:18.480 something like this
+00:43:20.000 that's an upward trend
+00:43:22.720 kinda linear or very very flat quadratic
+00:43:26.880 depending on how you want to look at it
+00:43:29.200 uh so that would be level versus trend
+00:43:32.000 yeah and then seasonality yeah i
+00:43:34.640 mentioned that one that's a that's a
+00:43:36.000 repetitive pattern that you have across
+00:43:38.400 the entire period of the sample
+00:43:42.079 i kind of hope i answered that one
+00:43:47.200 anymore or do we do we proceed
+00:43:49.680 let's proceed we do have a few more
+00:43:51.760 questions but
+00:43:52.880 we do have a lot of things to cover too
+00:43:54.880 so after some time
+00:43:57.280 fair enough in that case let me speed it
+00:43:59.040 up a little bit wrapping up this part uh
+00:44:02.640 exponential smoothing works out of the
+00:44:04.400 box are pretty much out of the box with
+00:44:06.480 stats models if you can swallow this in
+00:44:09.040 the slightly outdated syntax
+00:44:12.160 all the methods in this chapter those
+00:44:13.599 are special cases of the class called
+00:44:15.760 state-based models
+00:44:17.280 uh if you heard of kalman filter this is
+00:44:19.680 like the poster child of state space
+00:44:21.520 models
+00:44:23.280 more details and what not to run this
+00:44:25.280 one in part two of my notebook series
+00:44:30.079 it's nice to forecast stuff it's nice to
+00:44:31.839 look into the future but sometimes we'd
+00:44:33.280 also like to know what the hell is
+00:44:34.480 actually going on and this being 2021
+00:44:38.240 the era of instant gratification
+00:44:40.560 most people want to have that answer
+00:44:42.960 quickly well in all fairness maybe some
+00:44:45.200 of them have just suffered enough in i
+00:44:47.359 don't know sas or something because i
+00:44:50.319 sure want quick results if i have to
+00:44:52.560 spend some time in sas
+00:44:54.720 by the way if you don't know what sas is
+00:44:56.560 in the context of
+00:44:58.000 statistical software count your
+00:44:59.359 blessings
+00:45:02.880 there's everybody's
+00:45:04.960 well the company that everybody loves to
+00:45:06.800 hate
+00:45:07.599 namely facebook has the list over the
+00:45:09.760 last few years two libraries
+00:45:11.359 specifically dedicated to time series
+00:45:13.440 one is profit which probably most people
+00:45:15.359 have talked with have heard about and
+00:45:17.359 the other is cuts
+00:45:19.440 cuts came out
+00:45:21.920 well ts i think stands for time series i
+00:45:24.240 have no idea what ka is for
+00:45:28.160 this one came out like in june
+00:45:31.359 that's what part five of my series is
+00:45:33.680 going to be about so once i
+00:45:36.079 get to it point is those libraries are
+00:45:39.040 designed to get you
+00:45:40.880 fast accurate and interpretable models
+00:45:43.680 uh
+00:45:45.040 pretty much out of the box the only
+00:45:46.400 major dependency prophet has is
+00:45:48.720 uh stun to get hamilton monte carlo
+00:45:52.400 uh
+00:45:53.359 advantages compared to exponential
+00:45:56.319 smoothing
+00:45:57.520 you can have multiple seasonal patterns
+00:46:00.000 so that's super useful
+00:46:02.160 you can you are more flexible with your
+00:46:04.960 shapes of your trend in terms of what
+00:46:06.400 you manage to capture because unless
+00:46:08.160 something you see well monotone
+00:46:10.400 throughout the sample exponential smooth
+00:46:12.560 double triple exponentials moving are
+00:46:14.480 going to struggle
+00:46:16.079 and for the more mathematically inclined
+00:46:18.720 people
+00:46:19.680 uh listening to this
+00:46:21.520 this is based on the gums so the general
+00:46:24.560 generalized additive models which is
+00:46:26.319 pretty much a crazy powerful if not that
+00:46:29.359 easy to get into
+00:46:30.880 branch of nonparametric statistics
+00:46:34.000 uh profit
+00:46:35.520 uh everything is just a function of time
+00:46:37.760 that if that formula looks familiar to
+00:46:40.000 you compared to what was at the
+00:46:41.280 beginning good it's more or less the
+00:46:43.040 point
+00:46:44.079 uh
+00:46:45.040 we decompose our time series x into a
+00:46:48.079 trend
+00:46:49.359 uh and i intentionally change the
+00:46:51.680 subscript to strat to stress the fact
+00:46:54.000 that this is not a statistical model
+00:46:57.280 this is a curve fitting exercise so this
+00:47:00.000 is literally a deterministic function of
+00:47:01.839 time we're just trying to fit in the
+00:47:03.440 best way possible or with that or that
+00:47:05.760 we can st is a seasonal pattern
+00:47:08.079 combination thereof a
+00:47:11.280 so those two so far so good
+00:47:14.000 residuals at the end namely the part
+00:47:16.319 where we throw everything that we don't
+00:47:18.240 know what to do with
+00:47:20.559 and we hope that it's
+00:47:22.480 in the indistinguishable from a white
+00:47:24.240 noise yeah
+00:47:25.760 the more interesting part hd
+00:47:29.520 you can call it holiday special days
+00:47:31.839 irregular days whatever essentially this
+00:47:34.640 is a functionality in profit that's
+00:47:36.480 supposed to capture things like
+00:47:40.480 christmas is fixed but easter is not
+00:47:43.920 and yet in christian countries easter is
+00:47:46.720 going to be important
+00:47:48.400 uh i mean you know when it is going to
+00:47:50.640 happen before a gear starts but you
+00:47:53.040 don't know it a prior i mean it's not
+00:47:55.280 fixed every given year dito for the
+00:47:58.160 start of the ramadan in muslim countries
+00:47:59.920 those kinds of setups you know it's
+00:48:02.000 deterministic you know it's a priori but
+00:48:04.640 the difference the intervals between
+00:48:06.400 them are not the same but you can also
+00:48:08.640 use it to handle things like outliers
+00:48:12.000 you can handle use it to handle
+00:48:15.440 uh historical events say you are looking
+00:48:18.720 at the performance of the american stock
+00:48:21.040 exchange and then you get to something
+00:48:22.960 like september of 2001 but obviously all
+00:48:26.240 hell broke loose
+00:48:27.920 but it's not exactly a normal day so
+00:48:30.880 this is something that you might want to
+00:48:32.240 incorporate into your model to correct
+00:48:34.079 yeah that was that one was kind of
+00:48:36.160 different
+00:48:37.520 uh
+00:48:38.319 so that doesn't impact your entire uh
+00:48:40.880 model going forward
+00:48:43.920 very easy to customize it's literally a
+00:48:46.559 bunch of lego blocks just add and and go
+00:48:49.920 on from there
+00:48:51.599 uh
+00:48:52.480 it's a nice extension of double
+00:48:54.240 exponential smoothing because it takes
+00:48:56.000 care of multiple seasonal patterns which
+00:48:57.760 we'll see in a sec
+00:48:59.839 uh yeah curve fitting that i mentioned
+00:49:03.359 that thing that made me fall in love
+00:49:06.000 with profit
+00:49:07.680 you don't care about missing values
+00:49:10.319 you don't i mean it's missing it's
+00:49:12.800 remote it's an outlier it's suspicious
+00:49:14.640 it was a data collection error you don't
+00:49:16.480 care you just dump it
+00:49:18.079 why
+00:49:18.880 because this is a regression on time
+00:49:21.280 which means unlike exponential smoothing
+00:49:23.520 and also arima which we are not talking
+00:49:25.200 about today by the way uh we the the
+00:49:28.400 observations that we use they don't need
+00:49:30.720 to be regularly spaced
+00:49:32.720 which is an unbeliev which makes life
+00:49:35.760 unbelievably easier
+00:49:38.240 uh yeah probabilistic aspects
+00:49:40.319 hamiltonian monte carlo so
+00:49:42.559 kids when you try this at home
+00:49:45.119 i uh well it kinda works fine on linux
+00:49:48.640 and on mac
+00:49:49.839 if you have a windows machine make sure
+00:49:52.319 you read the instructions on compiling
+00:49:54.640 profit or specifically compiling
+00:49:56.240 compiling pi stand for profit because
+00:49:58.480 it's not exactly trivial but trust me
+00:50:01.440 based on the performance of the monte
+00:50:02.880 carlo methods it's more than worth it
+00:50:05.920 and those bits i am talking about in
+00:50:08.880 parts 4 and the upcoming part 5 of my of
+00:50:11.280 my notebook series
+00:50:13.040 again with apologies for the style of
+00:50:15.520 the slide so so um sorry to interrupt
+00:50:19.040 again
+00:50:19.920 so uh yeah there is a question on
+00:50:22.640 dealing with missing values in time
+00:50:24.960 series so profit
+00:50:26.800 as you mentioned it doesn't
+00:50:28.880 require any kind of special attention to
+00:50:31.280 missing values but what about
+00:50:32.720 traditional methods
+00:50:35.280 uh in terms of traditional methods in
+00:50:37.839 general
+00:50:39.359 let's see uh out of the box
+00:50:41.440 exponential's moving car is going to
+00:50:43.119 crash
+00:50:44.640 you're gonna have a problem there
+00:50:47.119 uh arima if you implement arima
+00:50:50.800 uh
+00:50:51.680 what would you call it from scratch
+00:50:54.559 this is going to have a problem as well
+00:50:57.280 if on the other hand you reformulate
+00:50:59.280 arima as a state space model which you
+00:51:01.839 can
+00:51:02.960 uh
+00:51:03.920 then you don't have a problem because
+00:51:05.680 state space models can handle
+00:51:08.720 i'm so sorry i hate slack so much
+00:51:11.520 and i hate it even more when it gives me
+00:51:13.440 updates all the time
+00:51:16.000 state-space models can handle
+00:51:18.319 missing values because they just
+00:51:20.800 effectively it's a filtering problem
+00:51:23.280 so to summarize exponential smoothing
+00:51:25.599 trouble state space models zero trouble
+00:51:28.960 arima depending on your implementation
+00:51:31.680 whether someone took care of it or not
+00:51:35.040 so would you go ahead with filling these
+00:51:36.960 missing values when dealing with time
+00:51:38.559 series problems or just ignore them
+00:51:41.280 uh
+00:51:42.720 personally i prefer to ignore them
+00:51:45.680 mostly because if i ignore them then
+00:51:48.720 then i know something well
+00:51:52.400 i know that what i'm looking in those
+00:51:54.160 instances is is is interpolation of some
+00:51:57.440 sort because if i decide to interpolated
+00:52:00.480 a priori myself that kinda makes it
+00:52:02.800 sensitive to the choice of interpolation
+00:52:04.559 method i use what do i do do i carry
+00:52:07.040 over the last known value do i take an
+00:52:09.599 average of the two adjacent ones same
+00:52:12.240 assuming i only have a single missing
+00:52:14.000 one
+00:52:15.760 do i fit a whole separate model just to
+00:52:18.000 fit just to
+00:52:20.960 interpolate the missing values
+00:52:23.119 honestly
+00:52:24.559 three out of four cases i just don't
+00:52:26.480 feel like going down that rabbit hole
+00:52:28.800 so i'm trying to use methods where i can
+00:52:30.559 get away with that also that's that's
+00:52:32.319 kind of another advantage of profit
+00:52:34.160 because you get the interpolation in
+00:52:36.240 sample of your missing values for free
+00:52:38.720 as a
+00:52:39.760 uh yeah as a byproduct of what you're
+00:52:42.160 doing really
+00:52:44.880 in practice i i tried in so far as i can
+00:52:47.839 i try not to not to
+00:52:50.640 feel missing values because it's a
+00:52:53.200 subjective choice and i'm not a huge fan
+00:52:55.040 of subjective choices in statistical
+00:52:56.800 modeling
+00:53:01.760 i hope that answers the question
+00:53:04.640 sure it does let's move on
+00:53:07.200 okay
+00:53:08.640 uh
+00:53:09.839 reading data in profit
+00:53:12.400 disclaimer for all the brilliance of the
+00:53:14.000 creators of prophet
+00:53:15.520 what possessed them to hard code
+00:53:18.319 the required column names for the
+00:53:20.240 timestamp and the series itself is
+00:53:22.319 beyond me
+00:53:23.520 but they did
+00:53:24.640 so the timestamp has to be called the s
+00:53:26.960 and the series has to be called y
+00:53:30.720 and as a data example let's call you
+00:53:33.040 know what else is everybody else talking
+00:53:34.960 about other than kovit for the last 18
+00:53:37.200 months
+00:53:39.599 let's look at the series of new cases i
+00:53:42.240 believe it's from
+00:53:43.520 new york or at least that's a data set i
+00:53:45.200 think gathered by the new york times
+00:53:48.000 uh why is it important if you look at
+00:53:50.319 the data set
+00:53:51.839 see that well obviously
+00:53:55.200 the number of positive cases in disease
+00:53:57.599 cannot fall below zero
+00:53:59.520 also if you look here it's well with the
+00:54:02.079 exception of this sudden jump up to a
+00:54:03.920 point and look it looked like it was
+00:54:06.559 kind of flat lining
+00:54:08.960 last but not least
+00:54:10.960 if you look a bit closer at the curve
+00:54:12.800 the curvature here here here and in this
+00:54:16.319 part it's a little different
+00:54:19.920 we can formalize that intuition
+00:54:22.800 excuse me
+00:54:24.400 by looking at change so-called change
+00:54:26.559 points in the in the trend
+00:54:29.119 and this is a functionality that's
+00:54:30.960 that's built that comes pre-built in in
+00:54:33.520 profit
+00:54:36.000 uh essentially as part of the estimation
+00:54:38.319 of the model it marks and this is what
+00:54:39.839 we get here of the dashed lines
+00:54:42.400 the points where the
+00:54:44.640 slope in the trend
+00:54:46.559 changed above a certain threshold if you
+00:54:49.200 think this is still too much doesn't
+00:54:51.359 look to me that way then you can mess
+00:54:53.440 with the parameter change point prior
+00:54:55.280 scale
+00:54:56.480 effectively what it says on the box it's
+00:54:58.400 a prior distribution that you slap on
+00:55:00.160 top of it if you want to regularize it
+00:55:03.280 uh you can also start thinking about
+00:55:06.559 well series where you don't want to
+00:55:08.240 predict too too much stuff
+00:55:10.640 i mean again sticking with the covered
+00:55:12.319 example i remember
+00:55:14.720 april last year
+00:55:16.319 there were some people who were claiming
+00:55:18.079 that at the current rate of growth there
+00:55:20.559 is going to be 11 million people sick in
+00:55:23.760 i think it was portugal if i remember
+00:55:26.079 correctly by end of summer
+00:55:28.799 trouble is portugal only has 9 million
+00:55:30.960 people
+00:55:32.160 so
+00:55:33.040 i think a lot of people don't exactly
+00:55:35.599 understand what exponential growth means
+00:55:38.799 uh and it's useful to
+00:55:41.200 take that into account when you're
+00:55:42.480 modeling real life data lest you end up
+00:55:44.720 looking like a tv presenter
+00:55:47.680 how do we do it
+00:55:49.440 we have a
+00:55:50.799 expert estimate what's the
+00:55:52.799 highest level that our process can reach
+00:55:55.520 or as well as the lowest one
+00:55:57.680 so we add it to our original data frame
+00:56:00.240 fit the model as before
+00:56:02.480 with the usual
+00:56:04.240 profit syntax make future data frame etc
+00:56:07.040 add to this the cup and the floor
+00:56:09.920 run prediction
+00:56:11.359 and voila this is what we are getting
+00:56:13.920 a prediction that has the ink already
+00:56:15.839 incorporated
+00:56:18.240 the floor
+00:56:19.440 sorry the floor
+00:56:20.960 and the
+00:56:22.000 cap
+00:56:22.799 well as you can see i was a bit too
+00:56:24.000 conservative with my cup because the
+00:56:25.839 series kind of does stick out but i
+00:56:27.920 think you're getting general idea
+00:56:30.400 uh
+00:56:31.160 seasonality
+00:56:32.720 uh accelerating bit quickly because i
+00:56:35.200 think we have like 18 minutes left
+00:56:37.680 uh
+00:56:38.640 this is gonna be two for the price of
+00:56:40.319 one
+00:56:41.200 uh i still apologize about the layout of
+00:56:43.440 the slide
+00:56:44.880 we're looking at hourly data
+00:56:47.040 so
+00:56:48.000 we are we fitted the model we specify
+00:56:50.160 the frequency number of periods ahead
+00:56:52.960 and
+00:56:54.000 we want to see the confidence interval
+00:56:56.319 and this is where the hamiltonian monte
+00:56:57.920 carlo comes in because the way profit
+00:57:00.559 constructs um
+00:57:03.680 confidence intervals and the like is
+00:57:05.680 just by by stimulation by monte carlo
+00:57:07.839 simulation
+00:57:08.960 and this is what we get when we fit
+00:57:11.040 doesn't matter actually the specific
+00:57:12.559 model itself this one and this one i'm
+00:57:14.480 demonstrating just to show
+00:57:16.480 that if you are working with hourly data
+00:57:19.760 then automatically you get an intraday
+00:57:22.240 seasonality fixed as estimated i'm so
+00:57:24.799 sorry
+00:57:25.839 with a
+00:57:27.040 uncertainty band around it
+00:57:29.839 uh
+00:57:31.599 this is
+00:57:32.799 what i mean this is daily
+00:57:35.440 for some reason they're doing the daily
+00:57:37.359 yearly weekly i don't fully understand i
+00:57:39.040 think daily weekly yearly would make
+00:57:40.559 more sense in decreasing frequency order
+00:57:42.559 but whatever weekly
+00:57:45.119 same thing and the annual pattern
+00:57:48.559 i have three years so i can get away
+00:57:50.240 with that
+00:57:51.280 relevant bits here
+00:57:52.960 multiple seasonal patterns
+00:57:55.920 smoothly accommodated into a single
+00:57:57.760 model
+00:57:58.799 a sideline for the more mathematically
+00:58:01.119 inclined fourier expansion
+00:58:03.839 just you you
+00:58:05.599 keep or leave components relating to
+00:58:07.760 different frequencies
+00:58:09.520 uh
+00:58:11.280 and
+00:58:12.079 if you incorporate them the simulation
+00:58:14.400 component which you just do by keeping
+00:58:16.480 by setting the mcmc samples on markov
+00:58:18.880 chain monte carlo number of samples
+00:58:21.440 above zero then you also get the
+00:58:23.040 uncertainty intervals
+00:58:26.319 holiday special days as i mentioned
+00:58:28.799 earlier i kind of like this one because
+00:58:31.119 i think this functionality is
+00:58:32.960 is just cool
+00:58:34.799 uh actually started norway you you
+00:58:38.319 actually you'll like that uh because i
+00:58:40.240 started looking at country holidays in
+00:58:42.160 pandas
+00:58:43.280 also and in baseline once in
+00:58:46.960 norway and if you can believe that they
+00:58:49.440 have all the other stuff listed as
+00:58:51.839 public holidays but they don't have
+00:58:53.200 christmas
+00:58:55.040 uh so that's why i was like actually you
+00:58:57.040 know what that's a good example to use
+00:58:58.640 here so i added manually
+00:59:01.280 the data frame describing christmas over
+00:59:03.599 my sample period
+00:59:06.079 you also get a nice functionality lower
+00:59:08.079 window upper window what does this mean
+00:59:10.000 you have a whole special day holiday
+00:59:14.319 you think this has some sort of effect
+00:59:17.280 on your series on date occurs
+00:59:20.079 but you can and that's fine that works
+00:59:22.000 out of the box but you know what you can
+00:59:23.359 also do you can say uh okay i think the
+00:59:26.400 effect is gonna start a day earlier
+00:59:28.799 before the date as well that's lower
+00:59:31.040 window minus one
+00:59:32.799 and it's gonna persist for something
+00:59:34.559 like a week afterwards which probably in
+00:59:36.640 the context of christmas kinda makes
+00:59:38.240 sense
+00:59:41.359 hence upper window seven
+00:59:43.440 combine the two yada yada and this is
+00:59:46.480 the kind of picture you get
+00:59:50.240 this is
+00:59:51.359 not perhaps super fascinating if you are
+00:59:54.559 only interested in prediction but if you
+00:59:56.640 are interested in finding out what's
+00:59:58.000 actually going on that i would argue
+00:59:59.760 then i would argue having those three
+01:00:01.359 things the actual series the predicted
+01:00:03.520 one example and the holidays and holiday
+01:00:06.160 effects in one graph
+01:00:08.240 is useful
+01:00:09.440 especially that you can zoom in a little
+01:00:11.680 bit on the periods of interest and then
+01:00:13.599 you know okay
+01:00:15.520 this point this was our predicted
+01:00:18.079 the red line the blue is the actual
+01:00:20.640 which means we overshot widely and this
+01:00:23.280 happened to coincide with this
+01:00:24.480 particular holiday
+01:00:26.160 and with this kind of thing it makes it
+01:00:28.559 fairly easy to to analyze
+01:00:31.520 uh well what actually happened along the
+01:00:34.079 way
+01:00:35.760 uh any questions
+01:00:41.359 there is a question but uh not exactly
+01:00:43.839 related to
+01:00:45.200 seasonality
+01:00:46.559 okay
+01:00:47.680 so let's take it uh towards the end it's
+01:00:50.880 related to nutrition models yeah
+01:00:53.280 okay
+01:00:54.799 and then uh
+01:00:58.799 last but not least
+01:01:00.720 at least for for today
+01:01:02.720 uh anomaly detection
+01:01:05.040 the reason to think of anomaly detection
+01:01:06.720 or as i mentioned earlier uh outlier
+01:01:08.720 detection outlier analysis
+01:01:12.319 what's in the name to gauche experian
+01:01:15.680 is the following
+01:01:16.960 trend and seasonal pattern are things
+01:01:19.280 that change
+01:01:20.799 uh they are random but we know that they
+01:01:23.200 are random and we know that they change
+01:01:25.760 so to borrow
+01:01:27.599 my favorite news villain of the last two
+01:01:29.520 decades mr ramsfeld those are known
+01:01:31.680 unknowns
+01:01:33.839 beyond that however all sorts of other
+01:01:36.079 things can happen we can have a change
+01:01:37.839 in the level of the of the series
+01:01:40.480 we can have unexpected events happening
+01:01:43.760 or we have
+01:01:45.200 events that we didn't even know happened
+01:01:46.960 but only find out about it after the
+01:01:48.799 fact because
+01:01:50.559 all of a sudden something in our data
+01:01:51.920 starts looking really weird
+01:01:54.400 uh
+01:01:55.280 this is where anomaly detection comes in
+01:01:58.400 and this is the point at which we circle
+01:02:00.880 back to exponential smoothing because
+01:02:02.960 what's exponential moving at the end of
+01:02:04.400 the day
+01:02:05.359 it's
+01:02:06.400 variation around the theme of a moving
+01:02:08.799 average
+01:02:10.160 and if you understand how moving average
+01:02:12.880 means and moving standard deviation
+01:02:15.280 then as a bonus you can get uh probably
+01:02:18.079 the simplest anomaly
+01:02:20.799 detection score ever namely the z score
+01:02:24.559 the basic idea is like this assuming x t
+01:02:26.799 is our original series
+01:02:28.960 x m is our rolling moving average over a
+01:02:31.839 period of m excuse me and sigma m
+01:02:36.079 instead only standard deviation
+01:02:39.119 then
+01:02:40.640 this thing
+01:02:42.400 has approximately normal distribution
+01:02:45.440 and that's dictated by one of the
+01:02:47.520 coolest results in probability namely
+01:02:49.760 central limit theorem
+01:02:53.200 in practice this means that if something
+01:02:55.599 has a normal distribution
+01:02:57.680 that think that then things further than
+01:03:00.319 plus minus three standard deviations
+01:03:02.319 from the mean are extremely unlikely
+01:03:05.520 uh extreme example of that is that the
+01:03:08.640 people who are building the atomic bomb
+01:03:10.640 in the manhattan project their computers
+01:03:13.039 did not allow them to do simulations
+01:03:14.720 that that much so they had to assume
+01:03:17.200 that normal distribution has a finite
+01:03:19.039 support so they literally assumed that
+01:03:22.160 beyond three standard deviations plus
+01:03:24.319 minus from the mean the probability of
+01:03:26.240 everything is zero
+01:03:28.240 i mean
+01:03:29.119 the bomb did explode when it was
+01:03:30.880 supposed to it did work so there is
+01:03:33.359 something to be said for crude
+01:03:34.640 approximation sometimes
+01:03:36.400 in our context if something sticks
+01:03:38.240 further away in the z-score
+01:03:40.720 that means it's very unlikely
+01:03:43.280 compared to what we consider normal
+01:03:45.280 behavior at the moment
+01:03:47.520 uh
+01:03:49.039 yeah anomalous the disease correlable
+01:03:51.440 free
+01:03:54.240 we read the data
+01:03:56.079 we have a look at it
+01:03:58.720 nothing nothing that's special so far
+01:04:02.319 that's literally yours you pick a window
+01:04:04.640 size which is effectively a parameter
+01:04:06.480 that you decide based on expert judgment
+01:04:10.960 you create a rolling object
+01:04:13.359 rolling mean running standard deviation
+01:04:16.480 translate into a z-score
+01:04:19.119 plot
+01:04:21.520 yeah sorry
+01:04:23.440 and then you can quickly find out which
+01:04:25.520 observations are out of range because
+01:04:26.960 you just pick the ones
+01:04:28.559 where the z-score was above free
+01:04:30.960 voila
+01:04:32.000 it's not a super foolproof method
+01:04:34.480 because it's well sensitive to a bunch
+01:04:36.240 of things
+01:04:37.200 number one uh well
+01:04:39.680 your subjective choice on the size of
+01:04:41.839 the window how big is it
+01:04:44.079 uh number two
+01:04:47.119 just about just about everything
+01:04:50.240 after suitable normalization becomes
+01:04:52.160 gaussian so you can use this heuristic
+01:04:54.640 but not everything there are
+01:04:56.240 distributions which do not conform to
+01:04:58.160 that and you might be in for a nasty
+01:05:00.079 surprise so it's not at all utterly
+01:05:02.400 foolproof
+01:05:03.520 but
+01:05:05.039 it's in the ballpark
+01:05:08.240 this part is literally working progress
+01:05:12.799 namely outlier detection if you try to
+01:05:15.119 do it the cuts way which is the one i'm
+01:05:17.440 currently writing
+01:05:18.960 uh you don't have to think an awful lot
+01:05:21.359 uh
+01:05:22.160 how to define stuff yourself just import
+01:05:26.240 the outlier detector class instantiate
+01:05:29.599 an object
+01:05:31.119 and then you feed it and voila
+01:05:33.680 you get a list of timestamps where
+01:05:35.520 suspicious things occur
+01:05:38.319 uh
+01:05:40.160 the second thing
+01:05:42.000 is
+01:05:42.960 looking at change points which i have
+01:05:45.200 mentioned earlier
+01:05:46.720 and this was actually something that i
+01:05:48.480 found that well that that and ensembling
+01:05:51.440 time series is what i really really like
+01:05:53.520 about cuts
+01:05:55.039 uh because this allows us to look at
+01:05:57.680 change points change points are in
+01:05:59.520 general you can think of it as
+01:06:00.880 distribution changes in your time series
+01:06:02.880 this can be a change in the mean it can
+01:06:05.119 be a change in the slope or direction
+01:06:07.359 completely of your linear trend linear
+01:06:09.440 trend those kinds of things
+01:06:11.680 it's a notorious problem if you are
+01:06:13.520 looking at real life data
+01:06:16.000 stuff changes all over very very few
+01:06:19.520 things are genuinely stationary pretty
+01:06:21.920 unpredictable over a longer time time
+01:06:24.240 horizon
+01:06:25.359 and the massive advantage of cuts is
+01:06:27.920 that it works pretty much out of the box
+01:06:30.559 uh riffing off to the question that was
+01:06:33.440 asked earlier but what does it mean i
+01:06:35.839 mean if the level changes where for
+01:06:38.240 instance something like this
+01:06:40.799 over this period
+01:06:42.319 the
+01:06:43.200 uh
+01:06:44.960 process oscillates around something say
+01:06:47.280 whatever 1.35 collapses than here but if
+01:06:51.680 you abstract away from the mean the type
+01:06:54.160 of dynamics is the same it's roughly
+01:06:56.319 equally volatile
+01:06:58.240 it's just that it happens around
+01:06:59.599 different levels
+01:07:01.680 needless to say if we try to estimate
+01:07:04.319 something like this with exponential
+01:07:06.400 smoothing we're gonna have massive
+01:07:08.319 problems until it catches up to a new
+01:07:10.400 level around here which means it's
+01:07:12.400 probably quite useful
+01:07:14.400 to be able to approximately at least
+01:07:16.799 catch those points when things change
+01:07:20.559 voila
+01:07:21.760 cuts again
+01:07:24.799 biocpd is one of i beautypiece is i
+01:07:27.680 think one of three or four
+01:07:30.400 change point detection algorithms in in
+01:07:32.480 cuts
+01:07:33.680 uh if you're impatient feel free to read
+01:07:35.760 up yourself if you
+01:07:37.520 can spur an extra week or so
+01:07:40.319 then wait for python wait for part five
+01:07:44.480 uh
+01:07:45.599 same as before we imported the detector
+01:07:47.520 object fitted
+01:07:49.920 voila
+01:07:51.359 approximately
+01:07:53.280 identified what's going
+01:07:54.839 on uh
+01:07:57.039 on a closing note as i mentioned up
+01:07:59.119 earlier
+01:08:00.799 this is not even a crash introduction
+01:08:03.599 this is an intro to an overview that's
+01:08:06.079 that's as best because the time series
+01:08:08.559 is a field has been around literally for
+01:08:10.640 a hundred years or
+01:08:12.720 almost
+01:08:14.079 uh
+01:08:15.039 there's a lot
+01:08:17.198 to talk about in terms of applications
+01:08:20.238 uh
+01:08:21.920 in the context of the
+01:08:23.679 notebook series as i mentioned earlier
+01:08:25.198 the things i have mapped out
+01:08:26.799 states-based models
+01:08:28.479 which i'm a huge fan because of how many
+01:08:30.479 things pop up as special cases from
+01:08:32.479 state space
+01:08:33.920 validation strategies for time series in
+01:08:36.000 particular why cross-validation is
+01:08:39.600 by by definition almost or almost always
+01:08:42.399 a bad idea for time series
+01:08:44.719 machine learning
+01:08:46.479 methods and obviously that includes deep
+01:08:49.198 learning
+01:08:50.719 hashtag lstm
+01:08:52.719 and also something that
+01:08:54.560 for some reason is not uh that well
+01:08:58.158 covered and not that many people looking
+01:09:00.080 to it which i think is a bloody shame
+01:09:01.679 personally
+01:09:03.279 our multivariate time series and
+01:09:05.600 specifically hierarchical models
+01:09:08.238 essentially hierarchical models is the
+01:09:10.238 fastest way to think about it
+01:09:12.158 say you have you are trying to predict
+01:09:15.839 uh
+01:09:17.359 gdp
+01:09:18.479 of european countries
+01:09:20.479 if you take into account the fact that
+01:09:23.439 let's just say even within the eu you
+01:09:25.279 can have aggregate output
+01:09:27.600 on eu level and you also have individual
+01:09:30.319 ones and you try to incorporate the
+01:09:32.000 dependencies between them you can then
+01:09:34.319 do a much better job in your prediction
+01:09:36.158 than you would have been able to do if
+01:09:38.000 you had only used each series
+01:09:39.839 individually despite the fact that from
+01:09:42.238 a setup and data amount etc point of
+01:09:45.198 view the problem would have been way way
+01:09:47.520 simpler
+01:09:49.359 so
+01:09:50.560 stay tuned and vote give up votes for
+01:09:53.439 continued motivation
+01:09:55.600 uh
+01:09:56.800 that's it from me thank you
+01:10:01.600 awesome awesome talk conrad thank you
+01:10:03.840 very much it was
+01:10:05.920 very informative and uh also very funny
+01:10:09.840 so i i loved it and uh there's
+01:10:12.640 there's still a lot of questions we have
+01:10:16.480 if you don't mind staying a bit over
+01:10:18.080 time i don't
+01:10:19.600 yeah no problem if you want you can stop
+01:10:21.440 sharing your screen now
+01:10:23.199 uh okay
+01:10:24.800 ah stop screen i think
+01:10:27.280 stop now yeah it's fine and uh okay
+01:10:30.400 let's take let's take some of them and
+01:10:32.800 um i if you have time later probably you
+01:10:36.480 can
+01:10:37.679 don't worry i i am not in any extreme
+01:10:40.320 hurry okay great
+01:10:42.840 so uh one of the questions
+01:10:45.679 that we have here is
+01:10:47.760 what if we don't have two full cycles
+01:10:49.840 for of data for forecast like fashion
+01:10:52.480 products
+01:10:54.239 uh you can still have a model just don't
+01:10:56.640 just don't do the seasonality
+01:10:59.199 just just don't do seasonality simple as
+01:11:00.960 that you can still have a legit model
+01:11:03.120 capturing a bunch of things just don't
+01:11:04.960 do seasonality i mean listen it's not
+01:11:07.760 like things will always go wrong because
+01:11:10.880 you might be right and something
+01:11:12.800 actually is a seasonal effect
+01:11:15.280 it's just that the risk that something
+01:11:16.960 is horribly wrong and you're gonna
+01:11:18.560 confuse a part of the cycle
+01:11:20.880 uh
+01:11:22.000 with a trend that's that's just too big
+01:11:26.320 okay uh
+01:11:27.760 the next one is what methods do we use
+01:11:30.480 for forecasting rare events which are
+01:11:33.040 still modeled by time like like natural
+01:11:35.760 disasters
+01:11:37.280 oh
+01:11:38.400 probably some probably some variation of
+01:11:41.360 anomaly detection
+01:11:43.040 i mean
+01:11:44.080 if you have
+01:11:47.520 this
+01:11:48.480 the my approach is there is a slight
+01:11:51.120 black humor component to it or you know
+01:11:53.360 gloomy component that's what it comes
+01:11:54.719 down to
+01:11:55.920 it's kind of horrible when disasters
+01:11:58.080 happen
+01:11:59.679 but it gives one more data point
+01:12:02.320 which means you can do something about
+01:12:04.000 it
+01:12:04.719 uh so what but that being said there's
+01:12:07.199 still usually very very few so what you
+01:12:09.760 can do
+01:12:11.360 is you can and that's something i plan
+01:12:13.199 to cover in a separate module on anomaly
+01:12:16.560 detection
+01:12:17.840 is
+01:12:18.880 you try to construct some sort of score
+01:12:22.320 that describes whether things are normal
+01:12:24.800 or not
+01:12:26.239 and then you monitor the score and your
+01:12:28.239 as your time series progresses
+01:12:30.080 and usually when there's something weird
+01:12:32.159 that starts going on the anomaly that
+01:12:35.040 means the distribution is gonna depart
+01:12:37.440 from what was normal behavior and you
+01:12:39.520 should be able to capture it i mean
+01:12:41.840 doing a super high level spoiler
+01:12:45.760 one idea is something like this
+01:12:47.920 if you have say two time series uh and
+01:12:50.560 you know a period where things are
+01:12:52.159 normal on both
+01:12:53.440 you can do a bunch of time series for
+01:12:55.280 that matter uh you can do time series
+01:12:57.679 you can do
+01:12:58.719 lump them together as a matrix and do
+01:13:01.280 principal components to the analysis to
+01:13:03.840 the pca the composition i can decompose
+01:13:05.840 i can value the composition that's the
+01:13:07.040 phrase i was looking for
+01:13:08.960 uh
+01:13:09.840 and the idea is the normal behavior
+01:13:12.640 that's gonna load
+01:13:14.320 to the high eigenvalues the ones that
+01:13:17.040 are representing what's normal what is
+01:13:19.600 the weird stuff that happens that's
+01:13:21.120 gonna load to the small to the tiny ones
+01:13:23.040 towards the end of the spectrum so the
+01:13:25.040 trick that you can do
+01:13:26.640 is
+01:13:27.440 you do an eigenvalue decomposition you
+01:13:29.679 drop the low eigenvalues and then you
+01:13:32.159 reconstruct the original matrix and then
+01:13:34.640 you start tracking the composition error
+01:13:37.199 reconstruction error and the trick is
+01:13:40.239 the normal stuff
+01:13:42.000 was loading to the eigenvalues that are
+01:13:44.080 still there
+01:13:45.360 which means
+01:13:47.040 the reconstruction error will be pretty
+01:13:48.880 low
+01:13:49.679 the weird stuff was loading to the tiny
+01:13:51.920 ones which are gone and that's where the
+01:13:53.920 construction error is going to explode
+01:13:56.239 but
+01:13:58.400 this is coming the this this this is
+01:14:00.719 coming because
+01:14:02.400 uh it's a problem that you encounter
+01:14:04.159 quite frequently and i kind of like the
+01:14:07.520 elegance of the idea that you can solve
+01:14:09.360 the modern problem with such a classic
+01:14:11.600 technique like pca
+01:14:17.520 great i was i was actually looking for
+01:14:20.080 one of the answers given from one of one
+01:14:21.920 of the audience but i'm not able to find
+01:14:23.760 it but if i do
+01:14:25.440 during the next question i i will okay i
+01:14:28.320 will share it and we can discuss that
+01:14:31.679 so the next question is should we handle
+01:14:33.920 missing data so this is something that
+01:14:35.440 you didn't discuss today time series as
+01:14:37.679 integration
+01:14:39.760 no
+01:14:40.719 no not
+01:14:42.080 so like if missing data percentage is
+01:14:44.480 large i mean 45 percent is quite large
+01:14:47.360 yes so uh should we handle missing data
+01:14:50.159 in those cases
+01:14:51.520 we might
+01:14:53.120 listen the thing about missing data
+01:14:54.800 there's no such thing as a universally
+01:14:56.239 good answer
+01:14:57.440 like everybody knows there's the no free
+01:14:59.280 launch theorem in the context of model
+01:15:01.040 performance
+01:15:02.239 uh
+01:15:03.280 there is a variation on the same theme
+01:15:05.280 if you look at
+01:15:07.360 uh
+01:15:08.800 missing data
+01:15:10.400 depending on a problem sometimes we can
+01:15:12.800 afford not to care
+01:15:14.640 sometimes we can afford with just you
+01:15:16.800 know
+01:15:17.520 slap a linear interpolation between and
+01:15:20.000 never look back
+01:15:22.800 we can do it using boosting but
+01:15:27.520 i guess it's a little bit of a matter
+01:15:29.280 it's a little bit a matter of like a
+01:15:31.679 philosophical or most perspective like i
+01:15:34.080 think for myself
+01:15:35.920 of missing values as just a step that i
+01:15:39.280 need to take care of and my ultimate
+01:15:41.280 goal is is a predictive model
+01:15:43.600 but if 50 of values are missing and i
+01:15:45.840 want to handle it using boosting
+01:15:48.320 then effectively i have another problem
+01:15:50.320 to solve i need to build another
+01:15:51.760 predictive model to even use the time
+01:15:54.320 series one
+01:15:55.520 but then you know if i built a boosting
+01:15:57.679 model to handle my missing values
+01:16:00.080 well then i might just as well say that
+01:16:02.080 the stuff i was going to predict is
+01:16:03.600 missing as well and be done so i kind of
+01:16:06.239 reformulated the problem completely
+01:16:08.080 which is legit it's it's a legit
+01:16:10.000 approach
+01:16:11.120 uh just just usually not my first choice
+01:16:16.560 okay but are there do you have any
+01:16:18.560 suggestions on what kind of uh
+01:16:21.600 like
+01:16:22.400 handling missing value techniques you
+01:16:23.920 can apply when like it's a
+01:16:26.159 mostly time series analysis
+01:16:28.640 like in terms of regression or it's just
+01:16:30.400 basic machine learning techniques that
+01:16:31.840 you always use
+01:16:34.560 carry over the last value
+01:16:36.719 essentially you know what it doesn't
+01:16:38.560 really matter that much
+01:16:41.040 what you apply
+01:16:42.480 as long as you
+01:16:45.600 as long as you distinguish
+01:16:47.760 between what you
+01:16:49.679 what was original observation and what
+01:16:51.920 is feeling right now at least in my
+01:16:53.520 experience
+01:16:54.640 like
+01:16:55.840 say you had a bunch of zeros
+01:16:57.920 and then you decided to
+01:17:00.400 fill out the missing values with zeros
+01:17:02.159 as well
+01:17:03.440 it's fine as long as you keep a column
+01:17:06.080 an extra column with an indicator that
+01:17:08.159 allows you to distinguish this was an
+01:17:09.920 original value so this is a genuine zero
+01:17:12.560 and this is just my interpolated zero
+01:17:15.760 that i find more important than
+01:17:19.199 than the choice of a specific method
+01:17:23.199 okay
+01:17:24.400 jumping on to the next question
+01:17:26.719 um
+01:17:26.960 [Music]
+01:17:28.960 it's about what kind of algorithms work
+01:17:31.600 well for demand forecasting or supply
+01:17:33.600 forecasting
+01:17:34.800 oh intermediate intermittent demand oh
+01:17:37.600 yes one yes one of my favorite horror
+01:17:40.000 stories
+01:17:41.040 uh
+01:17:42.080 there is this oh good gracious
+01:17:45.360 croston
+01:17:47.520 i think it's called crosstown method or
+01:17:49.199 something like this hold on let me let
+01:17:51.360 me check quickly
+01:17:54.000 yes
+01:17:54.960 uh
+01:17:56.159 just to get started uh crosstalk method
+01:17:59.280 which is effectively
+01:18:01.920 a cousin of exponential smoothing
+01:18:04.560 except you have two equations running in
+01:18:06.400 parallel uh one
+01:18:08.400 for the non-zero periods and the other
+01:18:10.880 for when will the non-zero periods
+01:18:12.960 actually occur and then you're trying to
+01:18:14.719 combine it so that's one way
+01:18:17.360 uh
+01:18:19.840 yeah the other i would probably cast it
+01:18:22.239 as a regression problem in this in the
+01:18:26.320 in the you know classic male sense and
+01:18:29.040 then uh
+01:18:30.239 because then it collapses to something
+01:18:32.560 like uh
+01:18:35.280 intermittent demand it's a bit like we
+01:18:37.120 insure with
+01:18:38.960 non-life insurance
+01:18:40.560 most of the time most things are not on
+01:18:43.280 fire
+01:18:44.560 but when they are a lot of things get on
+01:18:46.880 fire and the losses are very bad what
+01:18:49.040 does this mean in practice there's there
+01:18:50.960 are long periods of zero zero zero and
+01:18:53.199 then you have huge spikes in the series
+01:18:55.679 so people have been dealing this problem
+01:18:57.360 insurance for like next to forever
+01:18:59.760 and uh what frequently works you have
+01:19:02.880 two mod you kinda have two models one
+01:19:05.600 predicts is it a zero or a non-zero
+01:19:07.840 observation and then conditional on the
+01:19:10.239 result of this one you have a second one
+01:19:12.400 which is saying uh what the actual
+01:19:14.560 non-zero value will be
+01:19:17.360 i'm pretty sure something like this was
+01:19:18.719 applied the last time there was a little
+01:19:21.199 demand prediction on cargo competition
+01:19:23.600 cargo
+01:19:24.640 so i would suggest looking up that one
+01:19:28.159 okay and uh yeah sure i mean i'm not so
+01:19:31.280 much aware with this method but i would
+01:19:33.679 take a look after this talk
+01:19:38.000 you didn't spend you know like in
+01:19:40.239 biblical terms seven miserable years in
+01:19:42.960 corporate finance and for me that
+01:19:44.320 included insurance no never
+01:19:47.840 i've i've never dealt with time series
+01:19:50.560 data so
+01:19:52.239 which honestly not so much my head
+01:19:54.400 around how many people say that to me
+01:19:56.880 because seriously i spent a better part
+01:19:59.040 of the last 15 years being absolutely
+01:20:01.280 sure that like yeah come on it's a cute
+01:20:02.800 skill i picked up along the way and that
+01:20:04.320 was it like there's no application for
+01:20:06.320 it in 2020
+01:20:08.320 boy
+01:20:09.199 little did i know
+01:20:12.639 yeah true but yeah everyone is so
+01:20:15.199 interested in learning about time series
+01:20:16.880 including me and
+01:20:20.000 then we have the next question sorry we
+01:20:22.239 have to move a little bit
+01:20:25.040 so it's uh as as you can read the
+01:20:27.199 question on your screen
+01:20:30.800 how do you feel them
+01:20:32.639 uh
+01:20:34.320 depending on what are you feeding them
+01:20:36.000 into if you are fitting them into a
+01:20:37.760 machine learning algorithm or something
+01:20:39.520 like well like boosting like abhishek
+01:20:41.120 mentioned
+01:20:42.239 then you don't care
+01:20:45.600 you can drop those observations i mean
+01:20:48.719 or you can just backfill them with
+01:20:51.040 something and have an extra column uh
+01:20:54.560 that
+01:20:56.560 that indicates whether this was a
+01:20:57.920 genuine zero genuine zero or a or
+01:21:00.719 interpolated one
+01:21:03.280 that that's the most important bit
+01:21:05.040 honestly should i drop them you
+01:21:06.719 absolutely do not need to drop them a
+01:21:08.560 priori
+01:21:09.840 but if you have like uh five million
+01:21:12.880 observations well okay that's an
+01:21:14.560 overkill on monthly data if you have
+01:21:17.280 500 observations
+01:21:19.280 and you're creating logs then yeah
+01:21:20.719 probably dropping three rows doesn't
+01:21:22.080 hurt you in a whole lot
+01:21:24.719 if you can get away with it as a
+01:21:26.239 proportion of the data dump it and don't
+01:21:28.880 look back
+01:21:31.199 okay
+01:21:33.040 this question is about
+01:21:34.800 data snooping
+01:21:36.639 leading to finding random particles in
+01:21:38.080 time series data absolutely you stay
+01:21:40.560 long enough you'll find anything
+01:21:42.480 you stand long enough until you'll find
+01:21:44.000 anything because there is no such thing
+01:21:45.360 as geneva convention that prohibits
+01:21:47.120 torture for data
+01:21:49.120 so you you drill long enough you'll find
+01:21:51.120 everything in there and that's exactly
+01:21:53.920 like i remember when i was a student we
+01:21:57.280 once got an exercise
+01:21:59.840 the exercise was literally find the flaw
+01:22:02.000 in the reasoning because we were
+01:22:03.760 presenting with full-blown written in
+01:22:05.679 all seriousness exercise
+01:22:08.159 and like analysis you know data graphs
+01:22:11.040 you name it
+01:22:12.320 proving
+01:22:13.360 that storks
+01:22:14.960 bring children
+01:22:16.800 like okay that's the european variant
+01:22:18.560 whatever it is you're part of the word
+01:22:20.239 i'm sure there is some variant of that
+01:22:21.840 european variant when you explain to
+01:22:23.520 really little children where the babies
+01:22:25.040 come from you say storks come and drop
+01:22:27.120 them in the field
+01:22:28.960 and you're looking looking looking for
+01:22:30.480 this analysis and you're like what the
+01:22:31.840 hell the variable of stork presence is
+01:22:34.639 important it is number one predictor
+01:22:38.239 until you know
+01:22:40.000 after going back and forth a few times
+01:22:41.920 we're like wait a minute is there a
+01:22:43.600 variable controlling whether it's urban
+01:22:46.239 or rural
+01:22:47.760 and the moment you edit the variable are
+01:22:49.600 we talking about a city or the
+01:22:50.880 countryside the variable on presence of
+01:22:53.360 storks became irrelevant
+01:22:55.520 so you're staring the data long enough
+01:22:57.520 especially if something was not fully uh
+01:23:01.360 you know
+01:23:02.800 analyzed an exhaustive manner you'll
+01:23:04.800 find just about anything
+01:23:06.800 which is exactly the reason why i'm a
+01:23:08.320 huge fan of regularizing data
+01:23:10.239 regularizing the daylight out of
+01:23:11.679 anything that works
+01:23:13.840 yeah okay
+01:23:15.760 good funny answer
+01:23:17.199 um
+01:23:18.400 so next one so given a time series would
+01:23:20.560 you advise making dual analysis one to
+01:23:22.880 analyze the whole time series and also
+01:23:25.280 smaller parts of it to understand time
+01:23:27.040 series better
+01:23:28.880 as long as you don't spend too much time
+01:23:30.560 on the analysis of the sub parts
+01:23:32.080 absolutely in fact i don't view it i i
+01:23:35.199 view it as a sort of
+01:23:38.639 part of the same process really like
+01:23:42.560 if
+01:23:43.760 i wanna find out what's actually going
+01:23:45.920 on in the series it's just more or less
+01:23:47.360 stable over time this is most certainly
+01:23:49.600 one of the things i'm gonna do i'm gonna
+01:23:51.120 look at small
+01:23:52.400 i probably wouldn't look at the random
+01:23:54.639 segments in a time series but uniform
+01:23:56.719 like contiguous ones a window here a
+01:23:58.880 window there most certainly
+01:24:01.120 most certainly gives you a better
+01:24:02.800 understanding worst case scenario you
+01:24:05.040 will come away with a confident
+01:24:07.040 knowledge yeah stuff is stable i'm good
+01:24:10.000 that's the worst that can happen which
+01:24:11.520 is not a bad outcome let's be honest
+01:24:17.280 okay the next question is from the same
+01:24:18.880 person and he wants to know about the
+01:24:21.679 the difference between i'm not able to
+01:24:23.520 find the question so what is the
+01:24:25.199 difference between profit and cats
+01:24:28.320 what is the real difference between
+01:24:31.040 prophet is one of the models
+01:24:32.639 incorporated in cats
+01:24:34.800 prophet uh for pro prophet is uh um
+01:24:40.800 prophet is an ak-47 of time series
+01:24:44.639 models it's supposed to be the one tool
+01:24:47.120 that you will use to solve just about
+01:24:48.800 any problem you that falls in your lab
+01:24:51.600 that's related to daily modeling daily
+01:24:53.440 data
+01:24:54.400 cuts on the other hand
+01:24:56.639 it's a bit like a toolbox
+01:24:58.400 what cuts it has is it has profit as one
+01:25:01.600 of the possible models you can select to
+01:25:04.480 to well for for prediction
+01:25:06.639 so that's on the upside because i think
+01:25:08.239 there's like eight or nine more
+01:25:10.239 and that stuff ranges from like tata
+01:25:12.800 model which is uh
+01:25:15.600 you know
+01:25:16.639 ugly cousin of exponential smoothing to
+01:25:19.199 things like lso to lstm so literally
+01:25:22.000 from vintage to modern
+01:25:23.920 uh but on the downside it doesn't have
+01:25:27.280 uh the kind of
+01:25:29.600 detailed diagnostics or the ability to
+01:25:32.400 actually drill into the model to find
+01:25:33.679 out what's going on
+01:25:35.120 uh it has the functionality on
+01:25:36.960 ensembling it has
+01:25:39.199 more elaborate functionality on
+01:25:40.800 detecting change points
+01:25:42.880 so
+01:25:44.239 yeah
+01:25:45.120 they kind of overlap they come from the
+01:25:47.679 same source one
+01:25:49.440 encapsulates parts of the other
+01:25:51.840 but other than that it's it's
+01:25:55.600 yeah i don't think it's really that
+01:25:56.960 meaningful a comparison now that i think
+01:25:58.880 about it
+01:26:01.840 i have not used any of them so
+01:26:05.440 i would never know
+01:26:06.840 um so
+01:26:08.719 this question uh
+01:26:10.880 we will still take a couple of more
+01:26:12.560 questions if that's okay
+01:26:14.480 i'm cool
+01:26:20.840 yes probably as long as you are careful
+01:26:24.159 not to not to leak
+01:26:26.080 if you are careful with with you know
+01:26:29.199 with not introducing leakage then yes by
+01:26:31.360 all means
+01:26:32.320 by all means in fact something i've been
+01:26:34.000 doing on a
+01:26:35.440 fairly regular basis is
+01:26:37.920 if you want to build a decent predictive
+01:26:40.480 model in a machine learning sense
+01:26:43.040 sorry using machine learning approach uh
+01:26:45.440 then yes of course you can use light gbm
+01:26:48.000 or xg booster your favorite uh ensemble
+01:26:50.639 of trees
+01:26:51.760 uh with one
+01:26:53.840 big disclaimer
+01:26:55.760 they do not extrapolate
+01:26:58.000 which means if there's a possibility of
+01:26:59.600 that of data in the future being in a
+01:27:01.840 range that has not materialized before
+01:27:03.920 or visualized manifest or manifested
+01:27:06.480 manifested that's the way i was looking
+01:27:07.760 for hasn't manifested before er light
+01:27:10.400 gbm is going it can't can't capture that
+01:27:13.120 which is why a trick that can be used is
+01:27:15.840 you build a sort of parallel model
+01:27:18.560 linear
+01:27:19.600 so of course it's going to be dumber
+01:27:21.520 it's not going to be as accurate and
+01:27:23.360 whatnot which you then predictions from
+01:27:25.360 this model you plug as features into
+01:27:27.360 your lgbm the point of a linear model on
+01:27:30.080 the side
+01:27:31.040 is not to
+01:27:33.120 have good quality predictions it's just
+01:27:35.120 to have something operating in the
+01:27:37.280 broader range
+01:27:38.560 because lgbm purely by itself does not
+01:27:41.040 extrapolate from the range that was in
+01:27:42.960 the data
+01:27:43.920 linear models do
+01:27:45.520 so
+01:27:46.480 with hold winters i'm fairly certain you
+01:27:48.239 can you can achieve something similar
+01:27:50.400 like i said just be super super careful
+01:27:53.600 about introducing leakage
+01:27:58.080 okay
+01:28:00.880 the questions keep coming there's still
+01:28:03.600 so many questions so i i haven't really
+01:28:06.480 can i just make one tiny quest
+01:28:08.719 literally a minute break i need to go
+01:28:10.400 get some water because my voice
+01:28:18.960 so while conrad is taking getting some
+01:28:21.520 water i i think it's a good idea so like
+01:28:24.400 we have the pole
+01:28:25.920 and in that pole there are 205 votes and
+01:28:30.400 it i've asked if you're a beginner in
+01:28:33.760 time series and 80 percent of you have
+01:28:36.320 said yes so
+01:28:38.159 um and at the end of the presentation
+01:28:40.719 today i will also be sharing uh the
+01:28:43.440 links
+01:28:44.480 to conrad's tutorials
+01:28:46.880 and uh you will you can go to these
+01:28:49.199 kaggle notebooks and
+01:28:51.199 learn a lot more about time series
+01:28:54.000 yes
+01:28:55.520 ah i have water i'm re-energized
+01:28:58.880 okay i think i think we have had all
+01:29:01.679 already a lot of questions um
+01:29:05.280 let's take a couple more not more than
+01:29:07.679 that and then let's enjoy the weekend
+01:29:11.199 no that's fine
+01:29:12.639 best approaches to the multivariate
+01:29:13.920 forecasting
+01:29:18.560 out of the box if you have no better
+01:29:20.639 idea
+01:29:21.920 do a bunch of univariate models
+01:29:24.639 slightly more and then combine them
+01:29:26.719 slightly more slightly smarter version
+01:29:29.600 uh vector autoregression
+01:29:31.679 for lack of a better time it's like well
+01:29:33.440 yeah vector version of an autoregressive
+01:29:35.679 model
+01:29:37.120 if your taste goes more in the deep
+01:29:39.600 learning department then tubnet
+01:29:45.199 okay conrad
+01:29:46.639 really we still have a lot of questions
+01:29:48.480 but i'm not i'm not going through all of
+01:29:50.560 them anymore
+01:29:52.400 we
+01:29:53.280 i i can do another 15. that's okay
+01:29:57.280 i think i think it's fine now
+01:30:00.320 so um
+01:30:02.800 like i i made a poll while you were gone
+01:30:05.679 for water i was talking about the polls
+01:30:08.000 i made a poll and i asked are you a
+01:30:10.000 beginner in time series and
+01:30:12.239 eighty percent people say yes and twenty
+01:30:14.320 percent no two more than uh i think it's
+01:30:17.360 206 people who voted
+01:30:20.719 during your presentation and yeah so
+01:30:23.360 this question i always ask people like
+01:30:25.840 if they're presenting some something new
+01:30:27.840 or some some some topic um
+01:30:30.639 uh
+01:30:31.760 how would beginners go about learning
+01:30:33.520 about time series
+01:30:35.360 so do you recommend any books where to
+01:30:37.280 start from should they start from your
+01:30:38.719 own
+01:30:39.760 books
+01:30:41.440 well
+01:30:42.560 i think i've done enough so for
+01:30:44.159 self-promotion for one day
+01:30:48.560 let me
+01:30:49.639 quickly check something
+01:30:53.280 in terms of the
+01:30:56.080 uh books to read
+01:31:00.560 yes
+01:31:01.520 okay this is going to be
+01:31:04.000 horrible self-promotion again
+01:31:06.400 but the fastest way just to get to the
+01:31:08.480 recommendations is the
+01:31:10.639 the first of my notebooks in the series
+01:31:13.440 which towards the end of the
+01:31:16.560 groundwork section
+01:31:18.400 has
+01:31:19.520 something called
+01:31:21.120 like saying some useful references
+01:31:23.520 include
+01:31:24.560 the thing about useful references the
+01:31:26.320 the question is what is it that you want
+01:31:28.159 to do
+01:31:29.600 because there's a bunch of ways you can
+01:31:31.120 go about it
+01:31:32.719 if you just want to understand from a
+01:31:34.560 very very practical point of view
+01:31:37.040 then pretty much anything that rob
+01:31:39.840 hindman writes
+01:31:41.840 because
+01:31:42.880 the only
+01:31:44.560 important point to make
+01:31:46.560 hindman does all his analysis was that
+01:31:48.800 he publishes in r
+01:31:50.800 so if you are very religious in the r
+01:31:53.360 versus python for statistics conflict
+01:31:55.440 that this might be and then this might
+01:31:56.719 be an issue for you
+01:31:58.719 i'm not
+01:31:59.920 i believe in the best tool for the job
+01:32:02.320 uh but that might be a stumbling block
+01:32:04.719 for some people because r is not as
+01:32:06.639 widespread as widespread as it used to
+01:32:08.880 be like a couple years ago in terms of
+01:32:10.639 the other thing that i have here
+01:32:12.560 uh
+01:32:13.920 durbin and koppman time series analysis
+01:32:16.480 by state space methods if you want to
+01:32:18.400 understand f uh really
+01:32:21.520 good and general class of moles in state
+01:32:23.280 space models
+01:32:24.560 pretty much you understand this you
+01:32:26.400 understand common filter and then you're
+01:32:28.400 getting exponential smoothing arima and
+01:32:31.440 a bunch of other things pretty much for
+01:32:33.679 free as special cases
+01:32:35.679 and the um the only price for that is
+01:32:37.199 you go have to have to go literally like
+01:32:39.199 once through two pages of matrix algebra
+01:32:41.920 matrix algebra which let's be honest
+01:32:43.600 ain't that much
+01:32:45.280 uh there's this
+01:32:47.520 and if you want like a more academic
+01:32:50.159 treatment version then the first
+01:32:51.920 position on the list in there broccoli
+01:32:53.600 and davies
+01:32:55.120 broccoli and davis is really good it's
+01:32:58.320 it's a little older but it will give you
+01:33:00.320 a solid for the solid grasp of the
+01:33:01.920 foundation
+01:33:05.600 great i think i should get some of them
+01:33:10.400 uh okay so it's it's been more than one
+01:33:13.440 and a half hours and uh i think this is
+01:33:15.600 the longest talk we had um ever
+01:33:19.120 but also one of the most interesting
+01:33:21.440 talks and
+01:33:22.719 very funny talk
+01:33:25.280 i i had so much to learn people still
+01:33:27.360 have questions coming in so i i just
+01:33:29.360 wanted to ask will you be sharing your
+01:33:30.880 presentation will you be sharing your
+01:33:33.760 linkedin or twitter
+01:33:37.760 sure
+01:33:38.800 how do i share a presentation is a
+01:33:40.400 question i mean you can give me the link
+01:33:42.560 later and i will attach to the video
+01:33:45.120 if if the idea of just passing it to you
+01:33:47.760 and then you share it in the channel
+01:33:49.040 then yes by all means yeah if it's like
+01:33:51.120 yes connor do it right now and figure it
+01:33:52.880 out
+01:33:53.840 i'm like
+01:33:55.760 not do it right now
+01:33:58.080 and uh yeah sure so conrad is going to
+01:34:00.480 share the presentation and is it
+01:34:02.320 fine
+01:34:03.440 if people connect with you and ask you
+01:34:05.840 some questions they might have related
+01:34:08.239 time series later on after the talk sure
+01:34:11.760 i'll
+01:34:12.560 you know what
+01:34:13.760 i think it might be just fastest if you
+01:34:15.520 throw it
+01:34:16.880 if you throw my twitter handle in in the
+01:34:19.120 channel sure i think this might be most
+01:34:21.199 efficient
+01:34:22.960 uh because yeah
+01:34:25.199 the alternative is like what i don't
+01:34:26.880 have a youtube channel and doing all of
+01:34:28.880 it for linkedin probably isn't the most
+01:34:31.360 efficient manner
+01:34:33.120 so yeah i have to think that we do need
+01:34:35.600 one more session with you maybe some
+01:34:37.920 other name
+01:34:39.199 brother
+01:34:43.440 you know what just give me i think that
+01:34:45.840 just two things would need to happen
+01:34:47.920 one is uh
+01:34:49.920 i think we need to make it more focused
+01:34:52.400 so i can go into a little bit more
+01:34:53.920 detail on something
+01:34:55.440 and uh maybe just maybe
+01:34:58.960 give me another like two months so i can
+01:35:02.080 speed up a little bit on my schedule
+01:35:04.400 regarding uh the
+01:35:06.639 notebooks
+01:35:08.000 because then
+01:35:09.280 then it's just easier to to refer to
+01:35:11.280 something and
+01:35:12.639 also
+01:35:13.600 i need to learn how to do code blocking
+01:35:15.920 markdown so they don't look so horrible
+01:35:18.239 next time i think it was readable so
+01:35:20.639 it's fine
+01:35:22.800 i'm trying to strive for a little more
+01:35:24.639 than just merely readable it was not a
+01:35:27.280 lot of code so
+01:35:29.360 that's that's good
+01:35:30.800 so thank you conrad thank you once again
+01:35:33.520 for taking the time out and amazing talk
+01:35:36.080 uh thanks to all the audience who joined
+01:35:38.800 today yes thanks nice thanks for the
+01:35:40.880 questions i wish we had managed to
+01:35:42.560 answer more but
+01:35:44.800 i always do and
+01:35:46.960 yeah enjoy the rest of your weekend and
+01:35:49.119 see you next week
+01:35:50.800 thank you see you
+01:35:52.239 bye
