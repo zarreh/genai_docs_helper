@@ -1,3 +1,5 @@
 
+env_genai_docs/
 genai_docs/
 .vscode
+.env
