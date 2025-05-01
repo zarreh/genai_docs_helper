@@ -1,5 +1,6 @@
 
 env_genai_docs/
 genai_docs/
+data/chromadb
 .vscode
 .env
