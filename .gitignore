@@ -1,6 +1,7 @@
 
-env_genai_docs/
+env_genai/
 genai_docs/
-data/chroma_db
+data/chroma_db/
+Notebooks/data/chroma_db/
 .vscode
 .env
