@@ -11,6 +11,7 @@ from langchain_community.document_loaders import (DirectoryLoader,
 from langchain_community.vectorstores import Chroma
 from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
+from tqdm import tqdm
 
 from genai_docs_helper.config import LLM_TYPE
 
@@ -39,8 +40,8 @@ def load_markdown_files(directory: str = "./data/docs/") -> List:
 def load_jupyter_notebooks(directory: str = "./data/demand_forecast_notebooks/") -> List:
     """Load jupyter notebooks from directory"""
     documents = []
-    for notebook_path in glob.glob(f"{directory}/**/*.ipynb", recursive=True):
-        print(f"Path: {notebook_path}")
+    for notebook_path in tqdm(glob.glob(f"{directory}/**/*.ipynb", recursive=True)):
+        # print(f"Path: {notebook_path}")
         if ".ipynb_checkpoints" not in notebook_path:
             try:
                 loader = NotebookLoader(notebook_path, include_outputs=True, max_output_length=50, remove_newline=True)
@@ -50,21 +51,25 @@ def load_jupyter_notebooks(directory: str = "./data/demand_forecast_notebooks/")
     return documents
 
 
-def process_documents(documents: List, chunk_size: int = 1000, chunk_overlap: int = 20):
+def process_documents(documents: List, chunk_size: int = 5000, chunk_overlap: int = 20):
     """Split documents into chunks"""
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        length_function=len,
+        # chunk_size=chunk_size,
+        # chunk_overlap=chunk_overlap,
+        # length_function=len,
         separators=["\n## ", "\n### ", "\n#### ", "\n", " ", ""],
     )
-    return text_splitter.split_documents(documents)
+    splited_documents = text_splitter.split_documents(documents)
+    print(f"Total documents after splitting: {len(splited_documents)}")
+    return splited_documents
 
 
 def create_vector_store(documents: List, persist_directory: str = "./data/chroma_db"):
     """Create and persist vector store"""
+    print("Persisting vector store to disk...")
     # embeddings = OpenAIEmbeddings()
     vectorstore = Chroma.from_documents(documents=documents, embedding=EMBEDDING, persist_directory=persist_directory)
+    print("Persisting vector store to disk completed.")
     return vectorstore
 
 
