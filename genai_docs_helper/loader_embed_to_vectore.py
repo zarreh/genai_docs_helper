@@ -1,36 +1,18 @@
 # Required imports
 import glob
 import logging
-from typing import Dict, List, Literal
+from typing import Dict, List
 
-from dotenv import find_dotenv, load_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import (DirectoryLoader,
                                                   NotebookLoader,
                                                   UnstructuredMarkdownLoader)
 from langchain_community.vectorstores import Chroma
-from langchain_ollama import OllamaEmbeddings
-from langchain_openai import OpenAIEmbeddings
 from tqdm import tqdm
 
-# from genai_docs_helper.config import LLM_TYPE
+from genai_docs_helper.config import EMBEDDING
 
 logging.basicConfig(level=logging.INFO)
-
-
-LLM_TYPE = Literal['openai']  # use the openai embedding only for now
-EMBEDDING = (
-    OllamaEmbeddings(
-        model="llama3.2",
-        base_url="http://localhost:11434",
-        # verbose=True
-    )
-    if LLM_TYPE == "ollama"
-    else OpenAIEmbeddings()
-)
-
-# Load environment variables
-load_dotenv(find_dotenv())
 
 
 def load_markdown_files(directory: str = "./data/docs/") -> List:

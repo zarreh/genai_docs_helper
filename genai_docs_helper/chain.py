@@ -1,11 +1,11 @@
 from dotenv import find_dotenv, load_dotenv
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser
-# from langchain_core.output_parsers import StrOutputParser  # type: ignore
-from langchain_ollama import ChatOllama
-from langchain_openai import ChatOpenAI
 
-from genai_docs_helper.config import LLM_TYPE
+from genai_docs_helper.config import LLM
+
+# from langchain_core.output_parsers import StrOutputParser  # type: ignore
+
 
 # Load environment variables
 load_dotenv(find_dotenv())
@@ -35,22 +35,8 @@ Answer: Let me help you with that.
 # Create the prompt template
 PROMPT = PromptTemplate(template=custom_prompt_template, input_variables=["context", "question"])
 
-if LLM_TYPE == "ollama":
-    llm = ChatOllama(
-        model="llama3.2",
-        base_url="http://localhost:11434",
-        temperature=0,
-    )
-elif LLM_TYPE == "openai":
-    llm = ChatOpenAI(
-        model="gpt-3.5-turbo",
-        temperature=0,
-        # max_retries=3,
-        # request_timeout=60,
-        # headers=HEADERS
-    )
 
-chain = PROMPT | llm | StrOutputParser()
+chain = PROMPT | LLM | StrOutputParser()
 
 
 if __name__ == "__main__":
