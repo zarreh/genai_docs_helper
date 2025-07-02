@@ -5,3 +5,5 @@ data/chroma_db/
 Notebooks/data/chroma_db/
 .vscode
 .env
+.*/
+__pycache__/

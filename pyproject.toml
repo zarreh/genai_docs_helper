@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "genai-docs-helper"
+name = "genai_docs_helper"
 version = "0.1.0"
 description = ""
-authors = ["Ali Zarreh <zarreh.alireza@heb.com>"]
+authors = ["Ali Zarreh <alireza.zarreh@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -184,6 +184,8 @@ wrapt = "1.17.2"
 yarl = "1.20.0"
 zipp = "3.21.0"
 zstandard = "0.23.0"
+langgraph = {extras = ["studio"], version = "^0.5.0"}
+langgraph-cli = {extras = ["inmem"], version = "^0.3.3"}
 
 
 [build-system]
