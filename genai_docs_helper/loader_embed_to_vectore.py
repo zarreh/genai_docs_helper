@@ -1,7 +1,7 @@
 # Required imports
 import glob
 import logging
-from typing import Dict, List
+from typing import Dict, List, Literal
 
 from dotenv import find_dotenv, load_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -13,14 +13,16 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from tqdm import tqdm
 
-from genai_docs_helper.config import LLM_TYPE
+# from genai_docs_helper.config import LLM_TYPE
 
 logging.basicConfig(level=logging.INFO)
 
 
+LLM_TYPE = Literal['openai']  # use the openai embedding only for now
 EMBEDDING = (
     OllamaEmbeddings(
         model="llama3.2",
+        base_url="http://localhost:11434",
         # verbose=True
     )
     if LLM_TYPE == "ollama"
@@ -51,12 +53,12 @@ def load_jupyter_notebooks(directory: str = "./data/demand_forecast_notebooks/")
     return documents
 
 
-def process_documents(documents: List, chunk_size: int = 5000, chunk_overlap: int = 20):
+def process_documents(documents: List, chunk_size: int = 2000, chunk_overlap: int = 20):
     """Split documents into chunks"""
     text_splitter = RecursiveCharacterTextSplitter(
-        # chunk_size=chunk_size,
-        # chunk_overlap=chunk_overlap,
-        # length_function=len,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        length_function=len,
         separators=["\n## ", "\n### ", "\n#### ", "\n", " ", ""],
     )
     splited_documents = text_splitter.split_documents(documents)

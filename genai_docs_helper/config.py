@@ -1,1 +1,1 @@
-LLM_TYPE = ["openai", "ollama"][0]
+LLM_TYPE = ["openai", "ollama"][1]
