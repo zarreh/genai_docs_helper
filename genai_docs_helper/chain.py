@@ -2,7 +2,7 @@ from dotenv import find_dotenv, load_dotenv
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser
 
-from genai_docs_helper.config import LLM
+from genai_docs_helper.config import llm
 
 # from langchain_core.output_parsers import StrOutputParser  # type: ignore
 
@@ -36,7 +36,7 @@ Answer: Let me help you with that.
 PROMPT = PromptTemplate(template=custom_prompt_template, input_variables=["context", "question"])
 
 
-chain = PROMPT | LLM | StrOutputParser()
+chain = PROMPT | llm | StrOutputParser()
 
 
 if __name__ == "__main__":
