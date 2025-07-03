@@ -13,5 +13,5 @@ class GraphState(TypedDict):
     """
 
     question: str
-    generation: str
+    generation: str = ""
     documents: List[str]
