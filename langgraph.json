@@ -1,6 +1,6 @@
 {
     "dependencies": ["."],
     "graphs": {
-      "default": "genai_docs_helper.test_main:graph"
+      "default": "genai_docs_helper.main:graph"
     }
   }
