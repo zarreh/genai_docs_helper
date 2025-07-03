@@ -2,8 +2,8 @@ from dotenv import find_dotenv, load_dotenv
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
-LLM_TYPE = ["openai", "ollama"][0]
-EMBEDDING_TYPE = ["openai", "ollama"][0]
+LLM_TYPE = ["openai", "ollama"][1]
+EMBEDDING_TYPE = ["openai", "ollama"][1]
 
 # Load environment variables
 load_dotenv(find_dotenv())

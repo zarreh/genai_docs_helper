@@ -88,6 +88,6 @@ if __name__ == "__main__":
     processed_docs = process_documents(all_docs)
 
     print("Create and persist vector store")
-    vector_store = create_vector_store(processed_docs)
+    vector_store = create_vector_store(processed_docs, persist_directory="./data/chroma_db_ollama")
 
     print(f"Vector store created with {len(vector_store)} documents.")

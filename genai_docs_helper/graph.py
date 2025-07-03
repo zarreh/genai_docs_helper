@@ -69,6 +69,7 @@ workflow.add_conditional_edges(
     {
         "not supported": GENERATE,
         "useful": END,
+        "not useful": END,
     },
 )
 workflow.add_edge(GENERATE, END)

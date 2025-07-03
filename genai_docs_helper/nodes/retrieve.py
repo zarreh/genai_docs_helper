@@ -6,10 +6,10 @@ from genai_docs_helper.config import EMBEDDING
 from genai_docs_helper.state import GraphState
 
 # Load Chroma vector store
-vectorstore = Chroma(persist_directory="./data/chroma_db", embedding_function=EMBEDDING)
+vectorstore = Chroma(persist_directory="./data/chroma_db_ollama", embedding_function=EMBEDDING)
 
 # Define retriever
-retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
 
 
 def retrieve(state: GraphState) -> Dict[str, Any]:
