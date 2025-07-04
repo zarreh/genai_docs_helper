@@ -15,3 +15,5 @@ class GraphState(TypedDict):
     question: str
     generation: str = ""
     documents: List[str]
+    history: List[str] = []
+    retry_count: int = 0

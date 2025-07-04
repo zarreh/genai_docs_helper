@@ -24,9 +24,19 @@ def decide_to_generate(state):
 
 def grade_generation_grounded_in_documents_and_question(state: GraphState) -> str:
     print("---CHECK HALLUCINATIONS---")
+    
+    if state.get("retry_count", 0) >= 3:
+        print("---DECISION: MAX RETRIES REACHED. ENDING.---")
+        return "end"
+
     question = state["question"]
     documents = state["documents"]
     generation = state["generation"]
+
+    if len(documents) == 0:
+        print("---DECISION: NO DOCUMENTS TO GRADE AGAINST. RE-TRY---")
+        state["generation"] = "There are no documents to grade against. Please try again with a different question."
+        return "end"
 
     score = hallucination_grader.invoke({"documents": documents, "generation": generation})
 
@@ -69,7 +79,8 @@ workflow.add_conditional_edges(
     {
         "not supported": GENERATE,
         "useful": END,
-        "not useful": END,
+        "not useful": GENERATE,
+        "end": END,
     },
 )
 workflow.add_edge(GENERATE, END)
