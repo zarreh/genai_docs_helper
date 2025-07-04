@@ -49,6 +49,7 @@ graph_builder.add_edge("run_chain", END)
 
 # Compile the graph
 graph = graph_builder.compile()
+graph.get_graph().draw_mermaid_png(output_file_path="legacy_graph.png")
 
 # Example usage
 if __name__ == "__main__":
