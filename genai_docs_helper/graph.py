@@ -6,8 +6,7 @@ from genai_docs_helper.chains.answer_grader import answer_grader
 from genai_docs_helper.chains.hallucination_grader import hallucination_grader
 from genai_docs_helper.consts import (GENERATE, GRADE_DOCUMENTS, PARAPHRASE,
                                       RETRIEVE)
-from genai_docs_helper.nodes import (generate, grade_documents, paraphrase,
-                                     retrieve)
+from genai_docs_helper.nodes import generate, grade_documents, retrieve
 from genai_docs_helper.nodes.paraphrase import paraphrase
 from genai_docs_helper.state import GraphState
 

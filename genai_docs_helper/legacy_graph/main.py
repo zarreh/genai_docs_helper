@@ -2,11 +2,11 @@ from langchain_community.vectorstores import Chroma
 from langchain_core.runnables import RunnableLambda
 from langgraph.graph import END, StateGraph
 
-from genai_docs_helper.chain import chain
+from genai_docs_helper.legacy_graph.chain import chain
 from genai_docs_helper.config import EMBEDDING
 
 # Load Chroma vector store
-vectorstore = Chroma(persist_directory="./data/chroma_db", embedding_function=EMBEDDING)
+vectorstore = Chroma(persist_directory="./data/chroma_db_ollama", embedding_function=EMBEDDING)
 
 # Define retriever
 retriever = vectorstore.as_retriever(search_kwargs={"k": 5})

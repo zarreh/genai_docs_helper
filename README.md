@@ -1,8 +1,8 @@
 # genai_docs_helper
 TODO:
-- [ ] Fix linitng in graph.py
-- [ ] Add output generation if there were no output.
-- [ ] Modify the prompt to the older version in the main.py
+- [x] Fix linitng in graph.py
+- [x] Add output generation if there were no output.
+- [x] Modify the prompt to the older version in the main.py
 - [ ] Move old graph to a sub-directory
 - [ ] Generate more fake documents
 - [ ] Create fake codes
