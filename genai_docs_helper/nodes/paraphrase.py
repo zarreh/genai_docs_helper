@@ -11,6 +11,8 @@ def paraphrase(state: GraphState) -> dict[str, Any]:
 
     retry_count = state.get("retry_count", 0) + 1
 
+    print(f"Retry count: {retry_count}")
+
     generation = ""
     if retry_count >= 2:
         generation = "No groud truth were found for your question. Probably not related to the topic."

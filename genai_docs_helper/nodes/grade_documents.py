@@ -35,4 +35,11 @@ def grade_documents(state: GraphState) -> Dict[str, Any]:
     # if len(filtered_docs) == 0:
     #     print("---GRADE: NO RELEVENT DOCUMENT ARE FOUND---")
     #     return "end"
-    return {"documents": filtered_docs, "question": question}
+    # return {"documents": filtered_docs, "question": question}
+    return  {
+        "question": question,
+        "documents": filtered_docs,
+        "history": state.get("history", []),
+        "retry_count": state.get("retry_count", 0),
+        "generation": state.get("generation", ""),
+    }

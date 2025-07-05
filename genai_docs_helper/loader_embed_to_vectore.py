@@ -10,7 +10,7 @@ from langchain_community.document_loaders import (DirectoryLoader,
 from langchain_community.vectorstores import Chroma
 from tqdm import tqdm
 
-from genai_docs_helper.config import EMBEDDING
+from genai_docs_helper.config import EMBEDDING, ORIGINAL_DOCS_PATH, VECTOR_STORE_PATH
 
 logging.basicConfig(level=logging.INFO)
 
@@ -76,10 +76,10 @@ def format_citation(source_info: Dict) -> str:
 
 if __name__ == "__main__":
     print("Load markdown files")
-    markdown_docs = load_markdown_files()
+    markdown_docs = load_markdown_files(directory=ORIGINAL_DOCS_PATH)
 
     print("Load Jupyter notebooks")
-    notebook_docs = load_jupyter_notebooks()
+    notebook_docs = load_jupyter_notebooks(directory="./data/demand_forecast_notebooks/")
 
     print("Combine all documents")
     all_docs = markdown_docs + notebook_docs
@@ -88,6 +88,6 @@ if __name__ == "__main__":
     processed_docs = process_documents(all_docs)
 
     print("Create and persist vector store")
-    vector_store = create_vector_store(processed_docs, persist_directory="./data/chroma_db_ollama")
+    vector_store = create_vector_store(processed_docs, persist_directory=VECTOR_STORE_PATH)
 
     print(f"Vector store created with {len(vector_store)} documents.")
