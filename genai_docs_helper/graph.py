@@ -52,6 +52,7 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
         score = answer_grader.invoke({"question": question, "generation": generation})
         if answer_grade := score.binary_score:
             print("---DECISION: GENERATION ADDRESSES QUESTION---")
+            print(generation)
             return "useful"
         else:
             print("---DECISION: GENERATION DOES NOT ADDRESS QUESTION---")
