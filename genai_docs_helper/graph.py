@@ -5,7 +5,7 @@ from langgraph.graph import END, StateGraph
 from genai_docs_helper.chains.answer_grader import answer_grader
 from genai_docs_helper.chains.hallucination_grader import hallucination_grader
 from genai_docs_helper.consts import (GENERATE, GRADE_DOCUMENTS, PARAPHRASE,
-                                      RETRIEVE, RESTART)
+                                      RESTART, RETRIEVE)
 from genai_docs_helper.nodes import generate, grade_documents, retrieve
 from genai_docs_helper.nodes.paraphrase import paraphrase
 from genai_docs_helper.state import GraphState
@@ -14,7 +14,7 @@ load_dotenv()
 
 
 def decide_to_generate(state):
-    print("---ASSESS GRADED DOCUMENTS---")    
+    print("---ASSESS GRADED DOCUMENTS---")
 
     if state.get("retry_count", 0) >= 3:
         print("---DECISION: MAX RETRIES REACHED. ENDING.---")
@@ -61,6 +61,7 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
         print("---DECISION: GENERATION IS NOT GROUNDED IN DOCUMENTS, RE-TRY---")
         return "not supported"
 
+
 def retrieve_with_reset(state):
     return {"retry_count": 0}
 
@@ -75,7 +76,7 @@ workflow.add_node(RESTART, retrieve_with_reset)
 
 workflow.set_entry_point(RESTART)
 # workflow.add_edge(RETRIEVE, END)
-workflow.add_edge(RESTART,RETRIEVE)
+workflow.add_edge(RESTART, RETRIEVE)
 workflow.add_edge(RETRIEVE, GRADE_DOCUMENTS)
 workflow.add_conditional_edges(
     GRADE_DOCUMENTS,

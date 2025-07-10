@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 from langchain_community.vectorstores import Chroma
 
-from genai_docs_helper.config import EMBEDDING, ORIGINAL_DOCS_PATH, VECTOR_STORE_PATH
+from genai_docs_helper.config import EMBEDDING, VECTOR_STORE_PATH
 from genai_docs_helper.state import GraphState
 
 # Load Chroma vector store

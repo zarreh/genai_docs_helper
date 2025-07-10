@@ -36,7 +36,7 @@ def grade_documents(state: GraphState) -> Dict[str, Any]:
     #     print("---GRADE: NO RELEVENT DOCUMENT ARE FOUND---")
     #     return "end"
     # return {"documents": filtered_docs, "question": question}
-    return  {
+    return {
         "question": question,
         "documents": filtered_docs,
         "history": state.get("history", []),
