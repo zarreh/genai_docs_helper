@@ -52,7 +52,6 @@ def process_documents(documents: List, chunk_size: int = 2000, chunk_overlap: in
 def create_vector_store(documents: List, persist_directory: str = "./data/chroma_db"):
     """Create and persist vector store"""
     print("Persisting vector store to disk...")
-    # embeddings = OpenAIEmbeddings()
     vectorstore = Chroma.from_documents(documents=documents, embedding=EMBEDDING, persist_directory=persist_directory)
     print("Persisting vector store to disk completed.")
     return vectorstore
