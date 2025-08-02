@@ -11,11 +11,23 @@ VECTOR_STORE_PATH = "./data/chroma_db_warehouse"
 # Load environment variables
 load_dotenv(find_dotenv())
 
+# Performance settings
+ENABLE_CACHE = True
+REDIS_URL = "redis://localhost:6379"
+MAX_WORKERS = 5
+BATCH_SIZE = 5
+EARLY_STOPPING_THRESHOLD = 5
+CONFIDENCE_THRESHOLD = 0.7
+
+# Model settings for performance
 if LLM_TYPE == "ollama":
     llm = ChatOllama(
         model="llama3.2",
         base_url="http://localhost:11434",
         temperature=0.1,
+        num_ctx=2048,  # Reduced context for faster inference
+        num_gpu=1,
+        num_thread=8,
     )
 elif LLM_TYPE == "openai":
     llm = ChatOpenAI(

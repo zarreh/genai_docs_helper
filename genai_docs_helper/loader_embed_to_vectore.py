@@ -10,7 +10,8 @@ from langchain_community.document_loaders import (DirectoryLoader,
 from langchain_community.vectorstores import Chroma
 from tqdm import tqdm
 
-from genai_docs_helper.config import EMBEDDING, ORIGINAL_DOCS_PATH, VECTOR_STORE_PATH
+from genai_docs_helper.config import (EMBEDDING, ORIGINAL_DOCS_PATH,
+                                      VECTOR_STORE_PATH)
 
 logging.basicConfig(level=logging.INFO)
 
