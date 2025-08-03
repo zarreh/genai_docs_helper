@@ -22,3 +22,27 @@ docs-serve: ## Generate and serve documentation
 
 docs-clean: ## Clean generated documentation
 	@rm -rf docs/
+
+test: ## Run all tests
+	@poetry run pytest
+
+test-unit: ## Run unit tests only
+	@poetry run pytest tests/unit -v
+
+test-integration: ## Run integration tests only
+	@poetry run pytest tests/integration -v -m integration
+
+test-cov: ## Run tests with coverage report
+	@poetry run pytest --cov=genai_docs_helper --cov-report=html --cov-report=term
+
+test-watch: ## Run tests in watch mode
+	@poetry run pytest-watch
+
+test-parallel: ## Run tests in parallel
+	@poetry run pytest -n auto
+
+test-verbose: ## Run tests with verbose output
+	@poetry run pytest -vvs
+
+test-specific: ## Run specific test file (usage: make test-specific TEST=tests/unit/nodes/test_retrieve.py)
+	@poetry run pytest $(TEST) -v
