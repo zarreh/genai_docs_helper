@@ -46,6 +46,8 @@ def grade_document_batch(documents: List[Any], question: str, batch_size: int = 
         return []
 
     logger.info(f"Starting batch grading for {len(documents)} documents (batch_size={batch_size})")
+    logger.debug(f"Question for grading: '{question[:100]}...'")
+    
     results = []
     total_batches = (len(documents) + batch_size - 1) // batch_size
 
@@ -56,6 +58,10 @@ def grade_document_batch(documents: List[Any], question: str, batch_size: int = 
         logger.debug(f"Processing batch {batch_num}/{total_batches} ({len(batch)} documents)")
 
         try:
+            # Log sample of document content for debugging
+            for i, doc in enumerate(batch[:2]):  # Log first 2 docs of each batch
+                logger.debug(f"Sample doc {i} content: '{doc.page_content[:100]}...'")
+
             # Attempt batch grading using structured LLM output
             batch_results = batch_document_grader.invoke(
                 {"question": question, "documents": [doc.page_content for doc in batch]}
@@ -66,8 +72,16 @@ def grade_document_batch(documents: List[Any], question: str, batch_size: int = 
                 if i < len(batch):  # Safety check
                     results.append((batch[i], score.is_relevant, score.confidence))
                     logger.debug(
-                        f"Document {i} in batch {batch_num}: relevant={score.is_relevant}, confidence={score.confidence}"
+                        f"Document {i} in batch {batch_num}: relevant={score.is_relevant}, "
+                        f"confidence={score.confidence:.2f}"
                     )
+                    
+                    # Log why documents are filtered out
+                    if not score.is_relevant:
+                        logger.info(
+                            f"Document filtered out (confidence={score.confidence:.2f}): "
+                            f"'{batch[i].page_content[:50]}...'"
+                        )
 
             logger.debug(f"Batch {batch_num} completed successfully")
 

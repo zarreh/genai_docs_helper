@@ -278,3 +278,45 @@ class QueryCache:
                 logger.warning(f"Error clearing Redis cache: {e}")
 
         logger.info("Cache cleared successfully")
+
+    def invalidate_pattern(self, pattern: str) -> int:
+        """
+        Invalidate cache entries matching a pattern.
+
+        Args:
+            pattern: Substring to match in questions
+
+        Returns:
+            Number of entries invalidated
+        """
+        invalidated = 0
+
+        # Clear from memory cache
+        keys_to_remove = []
+        for key, value in self.memory_cache.items():
+            if pattern.lower() in str(value.get("data", {}).get("question", "")).lower():
+                keys_to_remove.append(key)
+
+        for key in keys_to_remove:
+            del self.memory_cache[key]
+            invalidated += 1
+
+        # Clear from Redis if available
+        if self.redis_client:
+            try:
+                keys = self.redis_client.keys("genai:*")
+                for key in keys:
+                    try:
+                        data = self.redis_client.get(key)
+                        if data:
+                            unpickled = pickle.loads(data)
+                            if pattern.lower() in str(unpickled.get("question", "")).lower():
+                                self.redis_client.delete(key)
+                                invalidated += 1
+                    except:
+                        pass
+            except Exception as e:
+                logger.warning(f"Error invalidating Redis cache: {e}")
+
+        logger.info(f"Invalidated {invalidated} cache entries matching pattern: {pattern}")
+        return invalidated

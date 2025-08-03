@@ -15,7 +15,7 @@ except ImportError:
 
 from genai_docs_helper.cache.query_cache import QueryCache
 from genai_docs_helper.chains.query_expander import query_expander_chain
-from genai_docs_helper.config import EMBEDDING, VECTOR_STORE_PATH
+from genai_docs_helper.config import EMBEDDING, VECTOR_STORE_PATH, ENABLE_CACHE, ENABLE_REDIS, REDIS_URL
 from genai_docs_helper.state import GraphState
 from genai_docs_helper.utils import get_logger, log_performance_metrics
 
@@ -23,7 +23,7 @@ from genai_docs_helper.utils import get_logger, log_performance_metrics
 logger = get_logger(__name__)
 
 # Initialize cache with Redis disabled by default for development
-cache = QueryCache(redis_url="redis://localhost:6379", ttl=3600, enable_redis=False)
+cache = QueryCache(redis_url=REDIS_URL, ttl=3600, enable_redis=ENABLE_REDIS)
 
 # Load vector store with error handling
 try:
@@ -34,11 +34,25 @@ except Exception as e:
     raise
 
 # Configure retrievers for different retrieval strategies
-RETRIEVAL_CONFIGS = {"fast": {"k": 20}, "standard": {"k": 50}, "comprehensive": {"k": 100}}
+RETRIEVAL_CONFIGS = {
+    "fast": {"k": 20, "fetch_k": 40},  # Add fetch_k for MMR
+    "standard": {"k": 50, "fetch_k": 100},
+    "comprehensive": {"k": 100, "fetch_k": 200}
+}
 
-fast_retriever = vectorstore.as_retriever(search_kwargs=RETRIEVAL_CONFIGS["fast"])
-standard_retriever = vectorstore.as_retriever(search_kwargs=RETRIEVAL_CONFIGS["standard"])
-comprehensive_retriever = vectorstore.as_retriever(search_kwargs=RETRIEVAL_CONFIGS["comprehensive"])
+# Update retriever initialization to use MMR for diversity
+fast_retriever = vectorstore.as_retriever(
+    search_type="mmr",  # Maximum Marginal Relevance for diversity
+    search_kwargs={**RETRIEVAL_CONFIGS["fast"], "lambda_mult": 0.5}
+)
+standard_retriever = vectorstore.as_retriever(
+    search_type="mmr",
+    search_kwargs={**RETRIEVAL_CONFIGS["standard"], "lambda_mult": 0.5}
+)
+comprehensive_retriever = vectorstore.as_retriever(
+    search_type="mmr",
+    search_kwargs={**RETRIEVAL_CONFIGS["comprehensive"], "lambda_mult": 0.5}
+)
 
 
 def compute_semantic_similarity(query_embedding: List[float], doc_embedding: List[float]) -> float:
@@ -270,17 +284,24 @@ def execute_comprehensive_retrieval_path(question: str, original_question: str) 
         logger.debug("Generating query variations")
         query_variations = query_expander_chain.invoke({"question": question})
 
+        # Add original question if not already included
+        all_queries = [original_question, question] + query_variations[:3]  # Include original
+        # Remove duplicates while preserving order
+        seen = set()
+        all_queries = [q for q in all_queries if not (q in seen or seen.add(q))]
+        
+        logger.debug(f"Using {len(all_queries)} unique queries for retrieval")
+
         # Parallel retrieval across all query variations
-        all_queries = [question] + query_variations[:3]  # Limit to 4 total queries
         all_documents = parallel_retrieve(all_queries)
 
         logger.info(f"Retrieved {len(all_documents)} unique documents from {len(all_queries)} queries")
 
         # Apply semantic reranking to focus on most relevant documents
-        reranked_documents = fast_semantic_rerank(original_question, all_documents, top_k=min(30, len(all_documents)))
+        reranked_documents = fast_semantic_rerank(original_question, all_documents, top_k=min(50, len(all_documents)))
 
-        # Final selection of top documents
-        final_documents = reranked_documents[:20]
+        # Final selection of top documents with higher count for better coverage
+        final_documents = reranked_documents[:30]  # Increased from 20
 
         result = {
             "documents": final_documents,
@@ -312,7 +333,7 @@ def execute_comprehensive_retrieval_path(question: str, original_question: str) 
 def retrieve(state: GraphState) -> Dict[str, Any]:
     """
     Main retrieval function with intelligent path selection and caching.
-
+    
     This function serves as the primary entry point for document retrieval,
     implementing a two-tier strategy: fast path for quick responses and
     comprehensive path for complex queries requiring better coverage.
@@ -342,24 +363,36 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
 
     logger.debug(f"Processing question: '{question[:100]}...'")
     logger.debug(f"Original question: '{original_question[:100]}...'")
+    logger.debug(f"Cache enabled: {ENABLE_CACHE}")
 
     # Generate cache key and check for cached results
     cache_key = generate_cache_key(question, "enhanced")
-    cached_result = cache.get(question)
-
-    if cached_result and cached_result.get("documents"):
-        logger.info("Cache hit! Returning cached results")
-        cached_result.update(
-            {
-                "from_cache": True,
-                "error_log": error_log,
-                "retry_count": state.get("retry_count", 0),
-            }
-        )
-        # Log performance metrics for cached result
-        if cached_result.get("performance_metrics"):
-            log_performance_metrics(logger, cached_result["performance_metrics"], cache_key[:8])
-        return cached_result
+    
+    # Check cache only if caching is enabled
+    if ENABLE_CACHE:
+        cached_result = cache.get(question)
+        
+        if cached_result and cached_result.get("documents"):
+            # Verify the cached result is for the same question
+            if cached_result.get("question") == question:
+                logger.info("Cache hit! Returning cached results")
+                cached_result.update(
+                    {
+                        "from_cache": True,
+                        "error_log": error_log,
+                        "retry_count": state.get("retry_count", 0),
+                        "question": question,
+                        "original_question": original_question,
+                    }
+                )
+                # Log performance metrics for cached result
+                if cached_result.get("performance_metrics"):
+                    log_performance_metrics(logger, cached_result["performance_metrics"], cache_key[:8])
+                return cached_result
+            else:
+                logger.warning(f"Cache key collision detected, ignoring cached result")
+    else:
+        logger.debug("Cache lookup skipped (caching disabled)")
 
     try:
         # Attempt fast retrieval path first
@@ -378,8 +411,11 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
             # Log performance metrics
             log_performance_metrics(logger, fast_result["performance_metrics"], cache_key[:8])
 
-            # Cache successful result
-            cache.set(question, "", fast_result)
+            # Cache successful result only if caching is enabled
+            if ENABLE_CACHE:
+                cache.set(question, "", fast_result)
+                logger.debug("Results cached for future use")
+
             return fast_result
 
         # Fall back to comprehensive retrieval
@@ -398,8 +434,10 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
         # Log performance metrics
         log_performance_metrics(logger, comprehensive_result["performance_metrics"], cache_key[:8])
 
-        # Cache successful result
-        cache.set(question, "", comprehensive_result)
+        # Cache successful result only if caching is enabled
+        if ENABLE_CACHE:
+            cache.set(question, "", comprehensive_result)
+            logger.debug("Results cached for future use")
 
         total_time = time.time() - start_time
         logger.info(f"=== RETRIEVAL COMPLETED SUCCESSFULLY in {total_time:.2f}s ===")

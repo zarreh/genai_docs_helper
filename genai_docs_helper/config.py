@@ -12,7 +12,7 @@ VECTOR_STORE_PATH = "./data/chroma_db_warehouse"
 load_dotenv(find_dotenv())
 
 # Performance settings
-ENABLE_CACHE = True
+ENABLE_CACHE = False  # Set to False to disable all caching
 ENABLE_REDIS = False  # Set to True only when Redis is available
 REDIS_URL = "redis://localhost:6379"
 MAX_WORKERS = 5
