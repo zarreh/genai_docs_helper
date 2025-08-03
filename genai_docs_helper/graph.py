@@ -85,7 +85,13 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
 def retrieve_with_reset(state):
     """Reset retry count when starting a new retrieval"""
     logger.info("=== STARTING NEW RETRIEVAL CYCLE ===")
-    return {"retry_count": 0}
+    # Clear any stale cache keys to prevent contamination
+    return {
+        "retry_count": 0,
+        "cache_key": None,
+        "error_log": [],
+        "performance_metrics": {},
+    }
 
 
 # Build the workflow
@@ -136,7 +142,25 @@ if __name__ == "__main__":
     question = "What machine learning models did we use in this project?"
     logger.info(f"Processing question: '{question}'")
     
-    result = graph.invoke({"question": question, "original_question": question})
+    # Create a fresh state for each invocation
+    initial_state = {
+        "question": question,
+        "original_question": question,
+        "generation": "",
+        "documents": [],
+        "history": [],
+        "retry_count": 0,
+        "query_variations": None,
+        "retrieved_documents_raw": None,
+        "reranked_documents": None,
+        "cache_key": None,
+        "performance_metrics": {},
+        "error_log": [],
+        "confidence_score": None,
+        "timestamp": None,
+    }
+    
+    result = graph.invoke(initial_state)
     
     logger.info("=== EXECUTION COMPLETED ===")
     logger.info(f"Final answer: {result.get('generation', 'No answer returned.')}...")
