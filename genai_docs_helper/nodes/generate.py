@@ -5,8 +5,8 @@ from genai_docs_helper.cache.query_cache import QueryCache
 from genai_docs_helper.chains.generation import generation_chain
 from genai_docs_helper.state import GraphState
 
-# Initialize cache
-cache = QueryCache(redis_url="redis://localhost:6379", ttl=3600)
+# Initialize cache with Redis disabled by default
+cache = QueryCache(redis_url="redis://localhost:6379", ttl=3600, enable_redis=False)
 
 
 def generate(state: GraphState) -> Dict[str, Any]:

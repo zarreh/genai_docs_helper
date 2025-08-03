@@ -7,7 +7,14 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import (DirectoryLoader,
                                                   NotebookLoader,
                                                   UnstructuredMarkdownLoader)
-from langchain_community.vectorstores import Chroma
+
+# Use the new langchain-chroma import
+try:
+    from langchain_chroma import Chroma
+except ImportError:
+    # Fallback to the community version if langchain-chroma is not available
+    from langchain_community.vectorstores import Chroma
+
 from tqdm import tqdm
 
 from genai_docs_helper.config import (EMBEDDING, ORIGINAL_DOCS_PATH,
@@ -51,10 +58,16 @@ def process_documents(documents: List, chunk_size: int = 2000, chunk_overlap: in
 
 def create_vector_store(documents: List, persist_directory: str = "./data/chroma_db"):
     """Create and persist vector store"""
-    print("Persisting vector store to disk...")
-    vectorstore = Chroma.from_documents(documents=documents, embedding=EMBEDDING, persist_directory=persist_directory)
-    print("Persisting vector store to disk completed.")
-    return vectorstore
+    print("Creating vector store...")
+    try:
+        vectorstore = Chroma.from_documents(
+            documents=documents, embedding=EMBEDDING, persist_directory=persist_directory
+        )
+        print("Vector store created and persisted successfully.")
+        return vectorstore
+    except Exception as e:
+        print(f"Error creating vector store: {e}")
+        raise
 
 
 def extract_relevant_context(doc) -> Dict:

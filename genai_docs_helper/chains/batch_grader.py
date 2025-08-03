@@ -1,6 +1,7 @@
 from typing import List
 
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from pydantic import BaseModel, Field
 
 from genai_docs_helper.config import llm
@@ -49,4 +50,10 @@ def format_documents_for_batch_grading(documents: List[str]) -> str:
     return "\n".join(formatted)
 
 
-batch_document_grader = batch_grade_prompt | structured_batch_grader
+# Create a proper chain using RunnablePassthrough
+batch_document_grader = (
+    RunnablePassthrough.assign(documents_text=lambda x: format_documents_for_batch_grading(x["documents"]))
+    | batch_grade_prompt
+    | structured_batch_grader
+)
+
