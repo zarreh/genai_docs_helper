@@ -76,46 +76,153 @@ make graph
 
 ```
 genai_docs_helper/
-├── nodes/              # Core processing nodes
-│   ├── retrieve.py     # Document retrieval with multiple strategies
-│   ├── grade_documents.py  # Relevance assessment
-│   ├── generate.py     # Answer generation
-│   └── paraphrase.py   # Query reformulation
-├── chains/             # LangChain components
-│   ├── generation.py   # Answer generation chain
-│   ├── hallucination_grader.py  # Hallucination detection
-│   └── retrieval_grader.py      # Document relevance grading
-├── cache/              # Caching system
-│   └── query_cache.py  # Dual-layer cache implementation
-├── monitoring/         # Performance monitoring
-│   └── performance_monitor.py  # Metrics collection
-├── state.py           # Graph state management
-├── graph.py           # Main workflow definition
-└── config.py          # Configuration settings
+├── nodes/                      # Core processing nodes
+│   ├── __init__.py
+│   ├── retrieve.py            # Multi-strategy document retrieval
+│   ├── grade_documents.py     # Batch relevance assessment
+│   ├── generate.py            # Answer generation with caching
+│   ├── paraphrase.py          # Query reformulation
+│   └── README.md              # Detailed node documentation
+├── chains/                     # LangChain components
+│   ├── __init__.py
+│   ├── generation.py          # Answer generation chain
+│   ├── retrieval_grader.py    # Single document relevance grading
+│   ├── batch_grader.py        # Batch document grading
+│   ├── hallucination_grader.py # Hallucination detection
+│   ├── answer_grader.py       # Answer quality checker
+│   ├── paraphraser.py         # Question paraphrasing
+│   ├── query_expander.py      # Query expansion for better retrieval
+│   ├── confidence_scorer.py   # Document confidence scoring
+│   ├── document_reranker.py   # LLM-based document reranking
+│   └── README.md              # Detailed chain documentation
+├── cache/                      # Caching system
+│   ├── __init__.py
+│   ├── query_cache.py         # Dual-layer cache implementation
+│   └── README.md              # Cache module documentation
+├── monitoring/                 # Performance monitoring
+│   ├── __init__.py
+│   ├── performance_monitor.py # Metrics collection and analysis
+│   └── README.md              # Monitoring documentation
+├── utils/                      # Utility functions
+│   ├── __init__.py
+│   └── logging_config.py      # Centralized logging configuration
+├── legacy_graph/               # Legacy implementation (reference)
+│   ├── __init__.py
+│   ├── app.py
+│   ├── chain.py
+│   └── main.py
+├── tests/                      # Comprehensive test suite
+│   ├── __init__.py
+│   ├── conftest.py            # Shared test fixtures
+│   ├── unit/                  # Unit tests
+│   │   ├── nodes/             # Node-specific tests
+│   │   │   ├── test_retrieve.py
+│   │   │   ├── test_grade_documents.py
+│   │   │   ├── test_generate.py
+│   │   │   └── test_paraphrase.py
+│   │   ├── chains/            # Chain-specific tests
+│   │   ├── cache/             # Cache tests
+│   │   │   └── test_query_cache.py
+│   │   └── monitoring/        # Monitoring tests
+│   │       └── test_performance_monitor.py
+│   └── integration/           # Integration tests
+│       └── test_workflow.py
+├── docs/                       # Generated documentation (pdoc)
+│   └── genai_docs_helper.html # Entry point for documentation
+├── logs/                       # Application logs
+│   └── performance/           # Performance metrics logs
+├── state.py                    # Graph state management
+├── graph.py                    # Main workflow definition
+├── config.py                   # Configuration settings
+├── consts.py                   # Constants and node names
+├── loader_embed_to_vectore.py  # Document loading and embedding
+├── Makefile                    # Build and run commands
+├── pytest.ini                  # Test configuration
+├── pyproject.toml             # Project dependencies
+└── README.md                  # This file
 ```
 
 ## 🧪 Testing
+
+The project includes a comprehensive test suite with unit and integration tests.
+
+### Running Tests
 
 ```bash
 # Run all tests
 make test
 
-# Run with coverage
+# Run unit tests only
+make test-unit
+
+# Run integration tests only
+make test-integration
+
+# Run with coverage report
 make test-cov
+
+# Run tests in parallel (faster)
+make test-parallel
 
 # Run specific test file
 make test-specific TEST=tests/unit/nodes/test_retrieve.py
+
+# Run tests in watch mode
+make test-watch
+```
+
+### Test Coverage
+
+The test suite aims for 80%+ code coverage and includes:
+- ✅ All node functions with edge cases
+- ✅ Chain components and prompt engineering
+- ✅ Cache operations with Redis fallback
+- ✅ Performance monitoring functionality
+- ✅ Error handling and recovery scenarios
+- ✅ End-to-end workflow integration
+
+View the coverage report:
+```bash
+make test-cov
+open htmlcov/index.html  # View detailed HTML coverage report
 ```
 
 ## 📖 Documentation
+
+### Generated Documentation
+
+The project uses `pdoc` for automatic API documentation generation:
 
 ```bash
 # Generate HTML documentation
 make docs
 
-# Serve documentation locally
+# Serve documentation locally (http://localhost:8080)
 make docs-serve
+
+# Clean generated documentation
+make docs-clean
 ```
+
+### Module Documentation
+
+Each major module includes its own README with detailed information:
+
+- [**Nodes Module**](genai_docs_helper/nodes/README.md) - Core processing nodes documentation
+- [**Chains Module**](genai_docs_helper/chains/README.md) - LangChain components documentation
+- [**Cache Module**](genai_docs_helper/cache/README.md) - Caching system documentation
+- [**Monitoring Module**](genai_docs_helper/monitoring/README.md) - Performance monitoring documentation
+
+### API Documentation Structure
+
+Once generated, the documentation includes:
+- Complete API reference for all modules
+- Type annotations and signatures
+- Docstring documentation
+- Source code browsing
+- Cross-references between modules
+
+Access the documentation at: `docs/genai_docs_helper.html`
 
 ## 🔧 Configuration
 
@@ -126,10 +233,17 @@ Key configuration options in `config.py`:
 LLM_TYPE = "ollama"  # or "openai"
 
 # Performance Settings
-ENABLE_CACHE = True     # Toggle caching
+ENABLE_CACHE = False    # Toggle caching (set to False for debugging)
 ENABLE_REDIS = False    # Use Redis (requires Redis server)
 MAX_WORKERS = 5         # Parallel processing workers
 BATCH_SIZE = 5          # Document grading batch size
+
+# Retrieval Settings
+RETRIEVAL_CONFIGS = {
+    "fast": {"k": 20, "fetch_k": 40},
+    "standard": {"k": 50, "fetch_k": 100},
+    "comprehensive": {"k": 100, "fetch_k": 200}
+}
 ```
 
 ## 📊 Performance Features
@@ -143,11 +257,13 @@ BATCH_SIZE = 5          # Document grading batch size
 - Dual-layer cache (Redis + Memory)
 - Automatic cache invalidation
 - Cache hit rate monitoring
+- Question-specific cache keys
 
 ### 3. **Performance Monitoring**
 - Request-level metrics tracking
 - Bottleneck identification
 - Detailed performance logs
+- JSON-based log analysis
 
 ## 🛠️ Advanced Usage
 
@@ -180,6 +296,19 @@ monitor.start_request("req-123")
 summary = monitor.end_request("req-123")
 ```
 
+### Analyzing Logs
+
+```python
+# Check logs directory
+ls logs/
+
+# View latest application log
+tail -f logs/latest.log
+
+# Analyze performance metrics
+python -m genai_docs_helper.monitoring.analyze_logs
+```
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -200,6 +329,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📧 Contact
 
-Your Name - your.email@example.com
+Ali Zarreh - ali@zarreh.ai
 
-Project Link: [https://github.com/yourusername/genai_docs_helper](https://github.com/yourusername/genai_docs_helper)
+Project Link: [https://github.com/zarreh/genai_docs_helper](https://github.com/zarreh/genai_docs_helper)
