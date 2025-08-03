@@ -19,6 +19,7 @@ MAX_WORKERS = 5
 BATCH_SIZE = 5
 EARLY_STOPPING_THRESHOLD = 5
 CONFIDENCE_THRESHOLD = 0.7
+RETRY_COUNT = 3
 
 # Model settings for performance
 if LLM_TYPE == "ollama":

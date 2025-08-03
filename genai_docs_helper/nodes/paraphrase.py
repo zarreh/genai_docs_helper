@@ -3,10 +3,13 @@ from typing import Any
 
 from genai_docs_helper.chains.paraphraser import paraphraser_chain
 from genai_docs_helper.state import GraphState
+from genai_docs_helper.utils import get_logger, log_performance_metrics
+
+logger = get_logger(__name__)
 
 
 def paraphrase(state: GraphState) -> dict[str, Any]:
-    print("---ENHANCED PARAPHRASE---")
+    logger.info("=== STARTING ENHANCED PARAPHRASE ===")
     start_time = time.time()
 
     question = state["question"]
@@ -14,14 +17,18 @@ def paraphrase(state: GraphState) -> dict[str, Any]:
     retry_count = state.get("retry_count", 0) + 1
     error_log = state.get("error_log", [])
 
-    print(f"Retry count: {retry_count}")
+    logger.info(f"Paraphrasing question (retry count: {retry_count})")
+    logger.debug(f"Current question: '{question[:100]}...'")
 
     try:
         paraphrased_question = paraphraser_chain.invoke({"question": question})
+        logger.info(f"Successfully paraphrased question")
+        logger.debug(f"Paraphrased to: '{paraphrased_question[:100]}...'")
 
         # Enhanced fallback logic
         generation = ""
         if retry_count >= 3:
+            logger.warning(f"Maximum retry count ({retry_count}) reached, providing fallback response")
             generation = "I apologize, but I couldn't find relevant information to answer your question. This might be because:\n1. The question is outside the scope of available documents\n2. The information might be phrased differently in the source material\n3. The topic might not be covered in the current knowledge base\n\nPlease try rephrasing your question or asking about a different topic."
 
         paraphrase_time = time.time() - start_time
@@ -29,6 +36,9 @@ def paraphrase(state: GraphState) -> dict[str, Any]:
         # Update performance metrics
         performance_metrics = state.get("performance_metrics", {})
         performance_metrics["paraphrase_time"] = paraphrase_time
+        performance_metrics[f"paraphrase_retry_{retry_count}"] = paraphrase_time
+
+        log_performance_metrics(logger, {"paraphrase_time": paraphrase_time, "retry_count": retry_count})
 
         return {
             "question": paraphrased_question,
@@ -44,7 +54,7 @@ def paraphrase(state: GraphState) -> dict[str, Any]:
         }
 
     except Exception as e:
-        print(f"Error in paraphrase: {e}")
+        logger.error(f"Error in paraphrase: {e}", exc_info=True)
         error_log.append(f"Paraphrase error: {str(e)}")
 
         # Fallback: slight modification of original question
@@ -53,6 +63,9 @@ def paraphrase(state: GraphState) -> dict[str, Any]:
             if not question.lower().startswith(("what", "how", "why", "when", "where"))
             else question
         )
+        
+        logger.warning(f"Using fallback paraphrase strategy")
+        logger.debug(f"Fallback question: '{fallback_question[:100]}...'")
 
         return {
             "question": fallback_question,

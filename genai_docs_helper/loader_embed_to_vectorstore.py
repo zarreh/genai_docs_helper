@@ -1,6 +1,5 @@
 # Required imports
 import glob
-import logging
 from typing import Dict, List
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -19,32 +18,47 @@ from tqdm import tqdm
 
 from genai_docs_helper.config import (EMBEDDING, ORIGINAL_DOCS_PATH,
                                       VECTOR_STORE_PATH)
+from genai_docs_helper.utils import get_logger, setup_logging
 
-logging.basicConfig(level=logging.INFO)
+# Initialize logging for this script
+setup_logging(log_level="INFO")
+logger = get_logger(__name__)
 
 
 def load_markdown_files(directory: str = "./data/docs/") -> List:
     """Load markdown files from directory"""
+    logger.info(f"Loading markdown files from {directory}")
     loader = DirectoryLoader(directory, glob="**/*.md", loader_cls=UnstructuredMarkdownLoader)
-    return loader.load()
+    docs = loader.load()
+    logger.info(f"Loaded {len(docs)} markdown documents")
+    return docs
 
 
 def load_jupyter_notebooks(directory: str = "./data/demand_forecast_notebooks/") -> List:
     """Load jupyter notebooks from directory"""
+    logger.info(f"Loading Jupyter notebooks from {directory}")
     documents = []
-    for notebook_path in tqdm(glob.glob(f"{directory}/**/*.ipynb", recursive=True)):
-        # print(f"Path: {notebook_path}")
+    notebook_paths = list(glob.glob(f"{directory}/**/*.ipynb", recursive=True))
+    
+    for notebook_path in tqdm(notebook_paths, desc="Loading notebooks"):
         if ".ipynb_checkpoints" not in notebook_path:
             try:
                 loader = NotebookLoader(notebook_path, include_outputs=True, max_output_length=50, remove_newline=True)
-                documents.extend(loader.load())
+                docs = loader.load()
+                documents.extend(docs)
+                logger.debug(f"Successfully loaded notebook: {notebook_path}")
             except Exception as e:
-                print(f"Error loading notebook {notebook_path}: {e}")
+                logger.error(f"Error loading notebook {notebook_path}: {e}")
+                
+    logger.info(f"Loaded {len(documents)} notebook documents")
     return documents
 
 
 def process_documents(documents: List, chunk_size: int = 2000, chunk_overlap: int = 20):
     """Split documents into chunks"""
+    logger.info(f"Processing {len(documents)} documents into chunks")
+    logger.debug(f"Chunk size: {chunk_size}, Overlap: {chunk_overlap}")
+    
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
@@ -52,21 +66,23 @@ def process_documents(documents: List, chunk_size: int = 2000, chunk_overlap: in
         separators=["\n## ", "\n### ", "\n#### ", "\n", " ", ""],
     )
     splited_documents = text_splitter.split_documents(documents)
-    print(f"Total documents after splitting: {len(splited_documents)}")
+    logger.info(f"Total documents after splitting: {len(splited_documents)}")
     return splited_documents
 
 
 def create_vector_store(documents: List, persist_directory: str = "./data/chroma_db"):
     """Create and persist vector store"""
-    print("Creating vector store...")
+    logger.info(f"Creating vector store with {len(documents)} documents")
+    logger.info(f"Persist directory: {persist_directory}")
+    
     try:
         vectorstore = Chroma.from_documents(
             documents=documents, embedding=EMBEDDING, persist_directory=persist_directory
         )
-        print("Vector store created and persisted successfully.")
+        logger.info("Vector store created and persisted successfully")
         return vectorstore
     except Exception as e:
-        print(f"Error creating vector store: {e}")
+        logger.error(f"Error creating vector store: {e}", exc_info=True)
         raise
 
 
@@ -88,19 +104,24 @@ def format_citation(source_info: Dict) -> str:
 
 
 if __name__ == "__main__":
-    print("Load markdown files")
+    logger.info("=== STARTING DOCUMENT LOADING AND VECTOR STORE CREATION ===")
+    
+    logger.info("Step 1: Loading markdown files")
     markdown_docs = load_markdown_files(directory=ORIGINAL_DOCS_PATH)
 
-    print("Load Jupyter notebooks")
+    logger.info("Step 2: Loading Jupyter notebooks")
     notebook_docs = load_jupyter_notebooks(directory="./data/demand_forecast_notebooks/")
 
-    print("Combine all documents")
+    logger.info("Step 3: Combining all documents")
     all_docs = markdown_docs + notebook_docs
+    logger.info(f"Total documents loaded: {len(all_docs)}")
 
-    print("Process documents into chunks")
+    logger.info("Step 4: Processing documents into chunks")
     processed_docs = process_documents(all_docs)
 
-    print("Create and persist vector store")
+    logger.info("Step 5: Creating and persisting vector store")
     vector_store = create_vector_store(processed_docs, persist_directory=VECTOR_STORE_PATH)
 
-    print(f"Vector store created with {len(vector_store)} documents.")
+    logger.info(f"=== VECTOR STORE CREATION COMPLETED ===")
+    logger.info(f"Vector store created with {len(processed_docs)} document chunks")
+    logger.info(f"Stored at: {VECTOR_STORE_PATH}")

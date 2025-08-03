@@ -4,6 +4,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from genai_docs_helper.utils import get_logger
+
+logger = get_logger(__name__)
+
 
 class PerformanceMonitor:
     """Monitor and log performance metrics"""
@@ -13,15 +17,18 @@ class PerformanceMonitor:
         self.log_dir.mkdir(parents=True, exist_ok=True)
         self.metrics: Dict[str, Any] = {}
         self.start_time: Optional[float] = None
+        logger.info(f"Performance monitor initialized with log directory: {self.log_dir}")
 
     def start_request(self, request_id: str):
         """Start timing a request"""
+        logger.debug(f"Starting performance monitoring for request: {request_id}")
         self.metrics[request_id] = {"start_time": time.time(), "stages": {}, "total_time": 0}
 
     def log_stage(self, request_id: str, stage: str, duration: float, metadata: Dict[str, Any] = None):
         """Log a stage completion"""
         if request_id in self.metrics:
             self.metrics[request_id]["stages"][stage] = {"duration": duration, "metadata": metadata or {}}
+            logger.debug(f"[{request_id}] Stage '{stage}' completed in {duration:.2f}s")
 
     def end_request(self, request_id: str):
         """End timing and save metrics"""
@@ -34,6 +41,8 @@ class PerformanceMonitor:
             with open(log_file, "a") as f:
                 f.write(json.dumps(self.metrics[request_id]) + "\n")
 
+            logger.info(f"[{request_id}] Request completed in {self.metrics[request_id]['total_time']:.2f}s")
+            
             # Return summary
             return self.get_summary(request_id)
 
@@ -43,11 +52,17 @@ class PerformanceMonitor:
             return {}
 
         metrics = self.metrics[request_id]
-        return {
+        summary = {
             "total_time": metrics["total_time"],
             "stages": {stage: data["duration"] for stage, data in metrics["stages"].items()},
             "bottlenecks": self._identify_bottlenecks(metrics),
         }
+        
+        # Log bottlenecks if any
+        if summary["bottlenecks"]:
+            logger.warning(f"[{request_id}] Performance bottlenecks detected: {', '.join(summary['bottlenecks'])}")
+            
+        return summary
 
     def _identify_bottlenecks(self, metrics: Dict[str, Any]) -> list:
         """Identify performance bottlenecks"""
@@ -57,6 +72,11 @@ class PerformanceMonitor:
 
         # Find stages taking more than 30% of total time
         total_time = metrics["total_time"]
-        bottlenecks = [stage for stage, data in stages.items() if data["duration"] > total_time * 0.3]
-
+        bottlenecks = []
+        
+        for stage, data in stages.items():
+            percentage = (data["duration"] / total_time) * 100
+            if data["duration"] > total_time * 0.3:
+                bottlenecks.append(f"{stage} ({percentage:.1f}%)")
+                
         return bottlenecks

@@ -5,9 +5,10 @@ from typing import Any, Dict, List, Tuple
 from genai_docs_helper.chains.batch_grader import batch_document_grader
 from genai_docs_helper.chains.retrieval_grader import retrieval_grader
 from genai_docs_helper.state import GraphState
+from genai_docs_helper.utils import get_logger, log_performance_metrics
 
 # Configure logging
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Configuration constants for production tuning
 GRADING_CONFIG = {
@@ -172,9 +173,19 @@ def grade_documents(state: GraphState) -> Dict[str, Any]:
     documents = state["documents"]
     error_log = state.get("error_log", [])
 
+    logger.debug(f"Grading documents for question: '{question[:100]}...'")
+
     # Handle empty document case
     if not documents:
         logger.warning("No documents provided for grading")
+        grading_metrics = {
+            "grading_time": time.time() - start_time,
+            "documents_graded": 0,
+            "documents_filtered": 0,
+            "early_stopped": False,
+        }
+        log_performance_metrics(logger, grading_metrics)
+        
         return {
             "question": question,
             "documents": [],
@@ -183,15 +194,10 @@ def grade_documents(state: GraphState) -> Dict[str, Any]:
             "generation": state.get("generation", ""),
             "error_log": error_log,
             "confidence_score": 0.0,
-            "performance_metrics": {
-                "grading_time": time.time() - start_time,
-                "documents_graded": 0,
-                "documents_filtered": 0,
-                "early_stopped": False,
-            },
+            "performance_metrics": grading_metrics,
         }
 
-    logger.info(f"Grading {len(documents)} documents using batch processing")
+    logger.info(f"Grading {len(documents)} documents using batch processing (batch_size={GRADING_CONFIG['batch_size']})")
 
     try:
         # Execute batch grading with error handling
@@ -225,23 +231,25 @@ def grade_documents(state: GraphState) -> Dict[str, Any]:
 
         # Compile performance metrics
         performance_metrics = state.get("performance_metrics", {})
-        performance_metrics.update(
-            {
-                "grading_time": grading_time,
-                "documents_graded": len(graded_results),
-                "documents_filtered": len(filtered_docs),
-                "overall_confidence": overall_confidence,
-                "early_stopped": early_stopped,
-                "relevance_rate": quality_metrics["relevance_rate"],
-                "high_confidence_docs": high_confidence_count,
-            }
-        )
+        grading_metrics = {
+            "grading_time": grading_time,
+            "documents_graded": len(graded_results),
+            "documents_filtered": len(filtered_docs),
+            "overall_confidence": overall_confidence,
+            "early_stopped": early_stopped,
+            "relevance_rate": quality_metrics["relevance_rate"],
+            "high_confidence_docs": high_confidence_count,
+        }
+        performance_metrics.update(grading_metrics)
 
         logger.info(f"=== GRADING COMPLETED ===")
         logger.info(
             f"Results: {len(filtered_docs)}/{len(documents)} documents passed "
             f"(confidence: {overall_confidence:.2f}, time: {grading_time:.2f}s)"
         )
+        
+        # Log detailed metrics
+        log_performance_metrics(logger, grading_metrics)
 
         return {
             "question": question,
@@ -258,11 +266,23 @@ def grade_documents(state: GraphState) -> Dict[str, Any]:
         }
 
     except Exception as e:
-        logger.error(f"Document grading failed critically: {e}")
+        logger.error(f"Document grading failed critically: {e}", exc_info=True)
         error_log.append(f"Document grading error: {str(e)}")
 
         # Fallback: include all documents with low confidence
         fallback_docs = documents[:15]  # Limit for safety
+        
+        logger.warning(f"Using fallback grading strategy, including top {len(fallback_docs)} documents")
+
+        fallback_metrics = {
+            "grading_time": time.time() - start_time,
+            "documents_graded": 0,
+            "documents_filtered": len(fallback_docs),
+            "early_stopped": False,
+            "grading_strategy": "fallback",
+        }
+        
+        log_performance_metrics(logger, fallback_metrics)
 
         return {
             "question": question,
@@ -272,13 +292,7 @@ def grade_documents(state: GraphState) -> Dict[str, Any]:
             "generation": state.get("generation", ""),
             "error_log": error_log,
             "confidence_score": 0.3,  # Low confidence for fallback
-            "performance_metrics": {
-                "grading_time": time.time() - start_time,
-                "documents_graded": 0,
-                "documents_filtered": len(fallback_docs),
-                "early_stopped": False,
-                "grading_strategy": "fallback",
-            },
+            "performance_metrics": fallback_metrics,
             "original_question": state.get("original_question", question),
             "query_variations": state.get("query_variations", []),
             "cache_key": state.get("cache_key"),
