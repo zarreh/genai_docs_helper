@@ -193,6 +193,7 @@ langchain-ollama = "^0.3.3"
 langchain-openai = "^0.3.27"
 redis = "^6.2.0"
 langgraph-api = "^0.2.117"
+pdoc = "^15.0.4"
 
 
 [build-system]

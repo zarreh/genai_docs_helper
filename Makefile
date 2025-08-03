@@ -11,3 +11,14 @@ run: ## Run the application
 
 graph: ## Generate the graph
 	@poetry run langgraph dev
+
+docs: ## Generate HTML documentation
+	@mkdir -p docs
+	@poetry run pdoc genai_docs_helper -o docs -d google --show-source
+	@echo "Documentation generated in docs/"
+
+docs-serve: ## Generate and serve documentation
+	@poetry run pdoc genai_docs_helper -d google --show-source
+
+docs-clean: ## Clean generated documentation
+	@rm -rf docs/
