@@ -4,7 +4,7 @@ lint: ## Lint and reformat the code
 	@poetry run isort genai_docs_helper
 
 run: ## Run the application
-	@poetry run python genai_docs_helper.graph
+	@poetry run python -m genai_docs_helper.graph
 
 graph: ## Generate the graph
 	@poetry run langgraph dev

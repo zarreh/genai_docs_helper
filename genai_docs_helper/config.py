@@ -13,6 +13,7 @@ load_dotenv(find_dotenv())
 
 # Performance settings
 ENABLE_CACHE = True
+ENABLE_REDIS = False  # Set to True only when Redis is available
 REDIS_URL = "redis://localhost:6379"
 MAX_WORKERS = 5
 BATCH_SIZE = 5
