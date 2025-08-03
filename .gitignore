@@ -6,3 +6,13 @@ genai_docs/
 .*/
 __pycache__/
 chroma_db*/
+logs/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+*.json
+*.csv
+*.tsv       

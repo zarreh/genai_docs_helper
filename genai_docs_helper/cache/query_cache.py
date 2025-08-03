@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import pickle
 import time
 from datetime import datetime
@@ -12,8 +11,10 @@ try:
 except ImportError:
     REDIS_AVAILABLE = False
 
+from genai_docs_helper.utils import get_logger
+
 # Configure logging
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class QueryCache:

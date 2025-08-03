@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional
@@ -18,9 +17,10 @@ from genai_docs_helper.cache.query_cache import QueryCache
 from genai_docs_helper.chains.query_expander import query_expander_chain
 from genai_docs_helper.config import EMBEDDING, VECTOR_STORE_PATH
 from genai_docs_helper.state import GraphState
+from genai_docs_helper.utils import get_logger, log_performance_metrics
 
 # Configure logging
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Initialize cache with Redis disabled by default for development
 cache = QueryCache(redis_url="redis://localhost:6379", ttl=3600, enable_redis=False)
@@ -340,6 +340,9 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
     original_question = state.get("original_question", question)
     error_log = state.get("error_log", [])
 
+    logger.debug(f"Processing question: '{question[:100]}...'")
+    logger.debug(f"Original question: '{original_question[:100]}...'")
+
     # Generate cache key and check for cached results
     cache_key = generate_cache_key(question, "enhanced")
     cached_result = cache.get(question)
@@ -353,6 +356,9 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
                 "retry_count": state.get("retry_count", 0),
             }
         )
+        # Log performance metrics for cached result
+        if cached_result.get("performance_metrics"):
+            log_performance_metrics(logger, cached_result["performance_metrics"], cache_key[:8])
         return cached_result
 
     try:
@@ -368,6 +374,9 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
                     "retry_count": state.get("retry_count", 0),
                 }
             )
+
+            # Log performance metrics
+            log_performance_metrics(logger, fast_result["performance_metrics"], cache_key[:8])
 
             # Cache successful result
             cache.set(question, "", fast_result)
@@ -386,6 +395,9 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
             }
         )
 
+        # Log performance metrics
+        log_performance_metrics(logger, comprehensive_result["performance_metrics"], cache_key[:8])
+
         # Cache successful result
         cache.set(question, "", comprehensive_result)
 
@@ -395,13 +407,22 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
         return comprehensive_result
 
     except Exception as e:
-        logger.error(f"Primary retrieval strategies failed: {e}")
+        logger.error(f"Primary retrieval strategies failed: {e}", exc_info=True)
         error_log.append(f"Retrieve error: {str(e)}")
 
         # Final fallback: simple retrieval without enhancements
         try:
             logger.info("Attempting fallback to basic retrieval")
             fallback_docs = fast_retriever.invoke(question)
+
+            fallback_metrics = {
+                "retrieval_time": time.time() - start_time,
+                "retrieval_strategy": "fallback",
+                "final_documents_count": len(fallback_docs),
+            }
+            
+            logger.warning(f"Fallback retrieval completed with {len(fallback_docs)} documents")
+            log_performance_metrics(logger, fallback_metrics, cache_key[:8])
 
             return {
                 "documents": fallback_docs,
@@ -410,15 +431,11 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
                 "query_variations": [],
                 "error_log": error_log,
                 "retry_count": state.get("retry_count", 0),
-                "performance_metrics": {
-                    "retrieval_time": time.time() - start_time,
-                    "retrieval_strategy": "fallback",
-                    "final_documents_count": len(fallback_docs),
-                },
+                "performance_metrics": fallback_metrics,
             }
 
         except Exception as fallback_error:
-            logger.critical(f"All retrieval methods failed: {fallback_error}")
+            logger.critical(f"All retrieval methods failed: {fallback_error}", exc_info=True)
             error_log.append(f"Fallback retrieve error: {str(fallback_error)}")
 
             # Return empty result to allow graceful degradation

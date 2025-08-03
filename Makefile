@@ -3,6 +3,9 @@ lint: ## Lint and reformat the code
 	@poetry run black genai_docs_helper --line-length 120 -q
 	@poetry run isort genai_docs_helper
 
+ingest: ## Install dependencies
+	@poetry run python -m genai_docs_helper.loader_embed_to_vectorstore
+
 run: ## Run the application
 	@poetry run python -m genai_docs_helper.graph
 
