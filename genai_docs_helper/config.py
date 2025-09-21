@@ -2,11 +2,11 @@ from dotenv import find_dotenv, load_dotenv
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
-LLM_TYPE = ["openai", "ollama"][1]
-EMBEDDING_TYPE = ["openai", "ollama"][1]
+LLM_TYPE = ["openai", "ollama"][0]
+EMBEDDING_TYPE = ["openai", "ollama"][0]
 
 ORIGINAL_DOCS_PATH = "./data/warehouse_docs/"
-VECTOR_STORE_PATH = "./data/chroma_db_warehouse"
+VECTOR_STORE_PATH = "./data/chroma_db_warehouse_openai/"
 
 # Load environment variables
 load_dotenv(find_dotenv())
