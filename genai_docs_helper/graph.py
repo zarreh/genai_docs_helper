@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from langchain_core.runnables import RunnableLambda
+from langchain_core.runnables.graph_mermaid import MermaidDrawMethod
 from langgraph.graph import END, StateGraph
 
 from genai_docs_helper.chains.answer_grader import answer_grader
@@ -134,7 +135,16 @@ workflow.add_edge(GENERATE, END)
 graph = workflow.compile()
 
 logger.info("Workflow graph compiled successfully")
-graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
+
+def generate_graph_diagram():
+    """Generate a visual diagram of the graph."""
+    try:
+        graph.get_graph().draw_mermaid_png(
+            output_file_path="graph.png",
+            draw_method=MermaidDrawMethod.PYPPETEER  # Use local rendering
+        )
+    except Exception as e:
+        print(f"Failed to generate graph diagram: {e}")
 
 
 if __name__ == "__main__":
@@ -169,3 +179,6 @@ if __name__ == "__main__":
     if result.get("performance_metrics"):
         logger.info("=== PERFORMANCE SUMMARY ===")
         log_performance_metrics(logger, result["performance_metrics"])
+
+    # Generate the graph diagram if needed
+    # generate_graph_diagram()
